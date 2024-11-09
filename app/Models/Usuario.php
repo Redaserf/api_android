@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class Usuario extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
     use SoftDeletes;
@@ -19,6 +19,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $table = 'usuarios';
     protected $fillable = [
         'nombre',
         'apellido',
@@ -45,4 +46,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function bicicletas(){
+        return $this->hasMany(Bicicleta::class, 'usuario_id');
+    }
+
+    public function recorridos(){
+        return $this->hasMany(Bicicleta::class, 'usuario_id');
+    }
+
 }
