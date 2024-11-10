@@ -110,7 +110,7 @@ class AuthController extends Controller
 
     // =====[ Envio de correo ]=====
 
-    public function sendActivationEmail(User $user){
+    public function sendActivationEmail(Usuario $user){
         $url = URL::temporarySignedRoute(
             'activation.verify', now()->addMinutes(60), ['id' => $user->id]
         );
@@ -132,7 +132,7 @@ class AuthController extends Controller
 
     public function activate($id, Request $request)
     {
-        $user = User::findOrFail($id);
+        $user = Usuario::findOrFail($id);
 
         if (!$request->hasValidSignature()) {
             return response()->json(['message' => 'Enlace de activación inválido o expirado.'], 403);
