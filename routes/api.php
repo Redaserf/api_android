@@ -28,6 +28,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // ===[ Users ]===
     Route::post('v1/register', [AuthController::class,'register']);
     Route::post('v1/login', [AuthController::class,'login']);
+    Route::post('v1/logout', [AuthController::class,'logout']);
+        // ===[ Endpoint para la activacion de la cuenta ]===
+        Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
 
     // ===[ Bicicletas ]===
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -47,7 +50,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         
     });
         
-    Route::post('v1/logout', [AuthController::class,'logout']);
-        // ===[ Endpoint para la activacion de la cuenta ]===
-        Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
 
