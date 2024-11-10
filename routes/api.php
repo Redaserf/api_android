@@ -47,3 +47,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         
     });
         
+    Route::post('v1/logout', [AuthController::class,'logout']);
+        // ===[ Endpoint para la activacion de la cuenta ]===
+        Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
+
