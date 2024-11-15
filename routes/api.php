@@ -18,36 +18,44 @@ use App\Http\Controllers\RecorridoController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 
-// ==========[ CRUD's ]==========
 
-    // ===[ Users ]===
-    Route::post('v1/register', [AuthController::class,'register']);
-    Route::post('v1/login', [AuthController::class,'login']);
-    Route::post('v1/logout', [AuthController::class,'logout']);
-        // ===[ Endpoint para la activacion de la cuenta ]===
+    Route::prefix("v1/")->group(function(){
+
+    // ==========[ CRUD's ]==========
+
+        // ===[ Users ]===
+        Route::post('register', [AuthController::class,'register']);
+        Route::post('login', [AuthController::class,'login']);
+        Route::post('logout', [AuthController::class,'logout']);
+        
+        // ===[ Activar cuenta y reenviar email ]===
+        Route::post('reenviar', [AuthController::class,'reenviar']);
         Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
 
-    // ===[ Bicicletas ]===
-    Route::middleware(['auth:sanctum'])->group(function () {
+        // ===[ Middleware |Tiene que estar logueado| ]===
+        Route::middleware(['auth:sanctum'])->group(function () {
+            
+            // ===[ Bicicletas ]===
+            Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
+            Route::put('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
+            Route::get('bicicletas', [BicicletaController::class, 'index']); // Traer todas las bicis
+            Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
+            Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
         
-        Route::post('v1/bicicleta', [BicicletaController::class, 'store']);//crear
-        Route::put('v1/bicicleta/{id}', [BicicletaController::class, 'update']);//editar
-        Route::get('v1/bicicletas', [BicicletaController::class, 'index']);//traer todas las bicis
-        Route::get('v1/bicicleta/{id}', [BicicletaController::class, 'show']);//traer una bici
-        Route::delete('v1/bicicleta/{id}', [BicicletaController::class, 'destroy']);//eliminar una bici
-    
-        // ===[ recorridos ]===
-        Route::post('v1/recorrido', [RecorridoController::class, 'store']);//crear
-        Route::put('v1/recorrido/{id}', [RecorridoController::class, 'update']);//editar
-        Route::get('v1/recorridos', [RecorridoController::class, 'index']);//traer todas las bicis
-        Route::get('v1/recorrido/{id}', [RecorridoController::class, 'show']);//traer una bici
-        Route::delete('v1/recorrido/{id}', [RecorridoController::class, 'destroy']);//eliminar una bici
-        
+            // ===[ Recorridos ]===
+            Route::post('recorrido', [RecorridoController::class, 'store']); // Crear
+            Route::put('recorrido/{id}', [RecorridoController::class, 'update'])->where('id', '[0-9]+'); // Editar
+            Route::get('recorridos', [RecorridoController::class, 'index']); // Traer todos los recorridos
+            Route::get('recorrido/{id}', [RecorridoController::class, 'show'])->where('id', '[0-9]+'); // Traer un recorrido
+            Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy'])->where('id', '[0-9]+'); // Eliminar un recorrido
+            
+        });
+
     });
         
 
