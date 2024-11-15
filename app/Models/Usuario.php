@@ -25,7 +25,7 @@ class Usuario extends Authenticatable
         'apellido',
         'correo',
         'password',
-        // 'rol_id',
+        'rol_id',
     ];
 
     /**
@@ -46,6 +46,11 @@ class Usuario extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class);
+    }
 
     public function bicicletas(){
         return $this->hasMany(Bicicleta::class, 'usuario_id');
