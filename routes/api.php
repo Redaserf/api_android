@@ -58,4 +58,3 @@ use App\Http\Controllers\RecorridoController;
 
     });
         
-

@@ -48,7 +48,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-      // =====[ Salir de la sesión ]=====
+      // =====[ Log out ]=====
+
 
     public function logout(Request $request)
     {
@@ -66,7 +67,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50',
             'apellido' => 'required|string|max:100',
-            'correo' => 'required|email|max:255|unique:usuarios',
+            'correo' => 'required|email|max:255|unique:users',
             'password' => 'required|min:8',
         ], [
             'nombre.required' => 'El campo nombre es obligatorio.',
@@ -93,8 +94,9 @@ class AuthController extends Controller
             'apellido' => $request->apellido,
             'correo' => $request->correo,
             'password' => Hash::make($request->password),
-            'rol_id' => 1
+            // 'rol_id' => 1 (se supone que debe ser guest)
         ]);
+
 
         // Enviar correo de activacion
         $this->sendActivationEmail($user);
@@ -103,86 +105,40 @@ class AuthController extends Controller
             'mensaje' => 'Usuario creado con éxito.',
             'usuario' => $user
         ], 201);
-
     }
 
-    // =====[ Envío de correo ]=====
+
+    // =====[ Envio de correo ]=====
 
     public function sendActivationEmail(Usuario $user){
-
         $url = URL::temporarySignedRoute(
-            'activation.verify', now()->addMinutes(30), ['id' => $user->id]
+            'activation.verify', now()->addMinutes(60), ['id' => $user->id]
         );
 
-        try {
+        $correo = $user->correo;
 
-            Mail::to($user->correo)->send(new CreaciondeCuenta($url, $user->correo));
+        try {
+            Mail::to($user->correo)->send(new CreaciondeCuenta($url,$correo));
             
         } catch (\Exception $e) {
-
             return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
         }
 
     }
 
-    public function reenviar(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'correo' => 'required|email|exists:usuarios,correo',
-        ], [
-            'correo.required' => 'El campo email es obligatorio.',
-            'correo.email' => 'Debe proporcionar un email válido.',
-            'correo.exists' => 'No existe un usuario registrado con ese email.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'mensaje' => 'Error en la validación de los datos',
-                'errores' => $validator->errors()
-            ], 400);
-        }
-
-        $user = Usuario::where('correo', $request->correo)->first();
-
-        if ($user->hasVerifiedEmail()) {
-            return response()->json(['mensaje' => 'El correo ya ha sido verificado anteriormente.'], 200);
-        }
-
-        $url = URL::temporarySignedRoute(
-            'activation.verify', now()->addMinutes(30), ['id' => $user->id]
-        );
-
-        try {
-
-            Mail::to($user->correo)->send(new CreaciondeCuenta($url, $user->correo));
-            
-        } catch (\Exception $e) {
-
-            return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
-
-        }
-
-        return response()->json([
-            'mensaje' => 'Se ha reenviado el correo de verificación. Por favor, revisa tu bandeja de entrada.',
-        ], 200);
-    }
 
      // =====[ Activacion de la cuenta ]=====
+
 
     public function activate($id, Request $request)
     {
         $user = Usuario::findOrFail($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'Cuenta no encontrada.']);
-        }
 
         if (!$request->hasValidSignature()) {
             return response()->json(['message' => 'Enlace de activación inválido o expirado.'], 403);
         }
        
         $user->email_verified_at = now();
-        $user->rol_id = 2;
         $user->save();
 
         return response()->json(['message' => 'Cuenta activada exitosamente.']);
