@@ -23,7 +23,7 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'nombre',
         'apellido',
-        'correo',
+        'email',
         'password',
         // 'rol_id',
     ];
@@ -46,6 +46,9 @@ class Usuario extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+
 
     public function bicicletas(){
         return $this->hasMany(Bicicleta::class, 'usuario_id');

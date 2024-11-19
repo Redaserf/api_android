@@ -48,6 +48,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         Route::get('v1/recorrido/{id}', [RecorridoController::class, 'show']);//traer una bici
         Route::delete('v1/recorrido/{id}', [RecorridoController::class, 'destroy']);//eliminar una bici
         
+
+
+        
     });
         
 
+
+    // == [ Re-envio de contra] ==
+    Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::post('v1/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
