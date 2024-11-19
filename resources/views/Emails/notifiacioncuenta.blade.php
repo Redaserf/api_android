@@ -96,7 +96,7 @@
 				font-size: 52px !important;
 			}
 		}
-	</style><!--[if mso ]><style>sup, sub { font-size: 100% !important; } sup { mso-text-raise:10% } sub { mso-text-raise:-10% }</style> <![endif]-->
+	</style>
 </head>
 
 <body class="body" style="background-color: #000000; margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
@@ -209,7 +209,7 @@
 				</td>
 			</tr>
 		</tbody>
-	</table><!-- End -->
+	</table>
 </body>
 
 </html>
