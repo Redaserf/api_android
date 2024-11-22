@@ -116,27 +116,26 @@ class AuthController extends Controller
             'activation.verify', now()->addMinutes(60), ['id' => $user->id]
         );
 
-        $correo = $user->correo;
+        $correo = $user->email;
 
         try {
-            Mail::to($user->correo)->send(new CreaciondeCuenta($url,$correo));
+            Mail::to($user->email)->send(new CreaciondeCuenta($url,$correo));
             
         } catch (\Exception $e) {
             return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
         }
 
     }
-}
 
 
     public function reenviar(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'correo' => 'required|email|exists:usuarios,correo',
+            'email' => 'required|email|exists:usuarios,email',
         ], [
-            'correo.required' => 'El campo email es obligatorio.',
-            'correo.email' => 'Debe proporcionar un email válido.',
-            'correo.exists' => 'No existe un usuario registrado con ese email.',
+            'email.required' => 'El campo email es obligatorio.',
+            'email.email' => 'Debe proporcionar un email válido.',
+            'email.exists' => 'No existe un usuario registrado con ese email.',
         ]);
 
         if ($validator->fails()) {
@@ -146,7 +145,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $user = Usuario::where('correo', $request->correo)->first();
+        $user = Usuario::where('email', $request->email)->first();
 
         if ($user->hasVerifiedEmail()) {
             return response()->json(['mensaje' => 'El correo ya ha sido verificado anteriormente.'], 200);
@@ -158,7 +157,7 @@ class AuthController extends Controller
 
         try {
 
-            Mail::to($user->correo)->send(new CreaciondeCuenta($url, $user->correo));
+            Mail::to($user->email)->send(new CreaciondeCuenta($url, $user->email));
             
         } catch (\Exception $e) {
 
