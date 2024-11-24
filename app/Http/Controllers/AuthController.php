@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Mail\CreaciondeCuenta;
+use App\Mail\emailRestablcerContra;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -19,11 +21,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'correo' => 'required|string|email',
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ], [
-            'correo.required' => 'El campo correo es obligatorio.',
-            'correo.email' => 'El correo no es válido.',
+            'email.required' => 'El campo email es obligatorio.',
+            'email.email' => 'El email no es válido.',
             'password.required' => 'El campo contraseña es obligatorio.',
         ]);
 
@@ -34,7 +36,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if (!Auth::attempt($request->only('correo', 'password'))) {
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'mensaje' => 'Credenciales inválidas'
             ], 401);
@@ -67,17 +69,21 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50',
             'apellido' => 'required|string|max:100',
+<<<<<<< HEAD
             'correo' => 'required|email|max:255|unique:users',
+=======
+            'email' => 'required|email|max:255|unique:usuarios',
+>>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
             'password' => 'required|min:8',
         ], [
             'nombre.required' => 'El campo nombre es obligatorio.',
             'nombre.max' => 'El nombre no puede exceder los 50 caracteres.',
             'apellido.required' => 'El campo apellido es obligatorio.',
             'apellido.max' => 'El nombre no puede exceder los 100 caracteres.',
-            'correo.required' => 'El campo correo es obligatorio.',
-            'correo.email' => 'El correo no es válido.',
-            'correo.max' => 'El correo no puede exceder los 255 caracteres.',
-            'correo.unique' => 'El correo ya está registrado.',
+            'email.required' => 'El campo email es obligatorio.',
+            'email.email' => 'El email no es válido.',
+            'email.max' => 'El email no puede exceder los 255 caracteres.',
+            'email.unique' => 'El email ya está registrado.',
             'password.required' => 'El campo contraseña es obligatorio.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
@@ -92,13 +98,17 @@ class AuthController extends Controller
         $user = Usuario::create([
             'nombre' => $request->nombre,
             'apellido' => $request->apellido,
-            'correo' => $request->correo,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
             // 'rol_id' => 1 (se supone que debe ser guest)
         ]);
 
+<<<<<<< HEAD
 
         // Enviar correo de activacion
+=======
+        // Enviar email de activacion
+>>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
         $this->sendActivationEmail($user);
 
         return response()->json([
@@ -115,10 +125,17 @@ class AuthController extends Controller
             'activation.verify', now()->addMinutes(60), ['id' => $user->id]
         );
 
+<<<<<<< HEAD
         $correo = $user->correo;
 
         try {
             Mail::to($user->correo)->send(new CreaciondeCuenta($url,$correo));
+=======
+        $correo = $user->email;
+
+        try {
+            Mail::to($user->email)->send(new CreaciondeCuenta($url,$correo));
+>>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
             
         } catch (\Exception $e) {
             return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
@@ -126,6 +143,51 @@ class AuthController extends Controller
 
     }
 
+<<<<<<< HEAD
+=======
+
+    public function reenviar(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:usuarios,email',
+        ], [
+            'email.required' => 'El campo email es obligatorio.',
+            'email.email' => 'Debe proporcionar un email válido.',
+            'email.exists' => 'No existe un usuario registrado con ese email.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'mensaje' => 'Error en la validación de los datos',
+                'errores' => $validator->errors()
+            ], 400);
+        }
+
+        $user = Usuario::where('email', $request->email)->first();
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['mensaje' => 'El correo ya ha sido verificado anteriormente.'], 200);
+        }
+
+        $url = URL::temporarySignedRoute(
+            'activation.verify', now()->addMinutes(30), ['id' => $user->id]
+        );
+
+        try {
+
+            Mail::to($user->email)->send(new CreaciondeCuenta($url, $user->email));
+            
+        } catch (\Exception $e) {
+
+            return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
+
+        }
+
+        return response()->json([
+            'mensaje' => 'Se ha reenviado el correo de verificación. Por favor, revisa tu bandeja de entrada.',
+        ], 200);
+    }
+>>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
 
      // =====[ Activacion de la cuenta ]=====
 
@@ -144,6 +206,81 @@ class AuthController extends Controller
         return response()->json(['message' => 'Cuenta activada exitosamente.']);
     }
 
+   // =====[ Contraseña olvidada ]=====
+
+   public function forgotPassword(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|string|email',
+    ], [
+        'email.required' => 'El campo email es obligatorio.',
+        'email.email' => 'El email no es válido.',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'mensaje' => 'Error en la validación de los datos.',
+            'errores' => $validator->errors()
+        ], 400);
+    }
+
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+
+    if ($status === Password::RESET_LINK_SENT) {
+        return response()->json([
+            'mensaje' => 'El enlace de restablecimiento de contraseña ha sido enviado a tu email electrónico.'
+        ], 200);
+    } else {
+        return response()->json([
+            'mensaje' => 'No se pudo enviar el enlace de restablecimiento. Inténtalo de nuevo más tarde.'
+        ], 500);
+    }
+}
+
+
+public function resetPassword(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|string|email',
+        'password' => 'required|string|min:8|confirmed',
+        'token' => 'required|string',
+    ], [
+        'email.required' => 'El campo correo es obligatorio.',
+        'email.email' => 'El correo no es válido.',
+        'password.required' => 'El campo contraseña es obligatorio.',
+        'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+        'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+        'token.required' => 'El token de restablecimiento es obligatorio.',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'mensaje' => 'Error en la validación de los datos.',
+            'errores' => $validator->errors()
+        ], 400);
+    }
+
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->password = Hash::make($password);
+            $user->save();
+        }
+    );
+
+    if ($status === Password::PASSWORD_RESET) {
+        return response()->json([
+            'mensaje' => 'La contraseña ha sido restablecida exitosamente.'
+        ], 200);
+    } else {
+        return response()->json([
+            'mensaje' => 'No se pudo restablecer la contraseña. Inténtalo de nuevo.'
+        ], 500);
+    }
+}
+//
 
 
 }

@@ -58,3 +58,8 @@ use App\Http\Controllers\RecorridoController;
 
     });
         
+
+
+    // == [ Re-envio de contra] ==
+    Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::post('v1/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
