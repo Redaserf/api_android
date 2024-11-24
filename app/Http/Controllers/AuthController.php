@@ -69,11 +69,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50',
             'apellido' => 'required|string|max:100',
-<<<<<<< HEAD
-            'correo' => 'required|email|max:255|unique:users',
-=======
             'email' => 'required|email|max:255|unique:usuarios',
->>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
             'password' => 'required|min:8',
         ], [
             'nombre.required' => 'El campo nombre es obligatorio.',
@@ -103,12 +99,7 @@ class AuthController extends Controller
             // 'rol_id' => 1 (se supone que debe ser guest)
         ]);
 
-<<<<<<< HEAD
-
-        // Enviar correo de activacion
-=======
         // Enviar email de activacion
->>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
         $this->sendActivationEmail($user);
 
         return response()->json([
@@ -125,17 +116,10 @@ class AuthController extends Controller
             'activation.verify', now()->addMinutes(60), ['id' => $user->id]
         );
 
-<<<<<<< HEAD
-        $correo = $user->correo;
-
-        try {
-            Mail::to($user->correo)->send(new CreaciondeCuenta($url,$correo));
-=======
         $correo = $user->email;
 
         try {
             Mail::to($user->email)->send(new CreaciondeCuenta($url,$correo));
->>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
             
         } catch (\Exception $e) {
             return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
@@ -143,8 +127,6 @@ class AuthController extends Controller
 
     }
 
-<<<<<<< HEAD
-=======
 
     public function reenviar(Request $request)
     {
@@ -187,7 +169,6 @@ class AuthController extends Controller
             'mensaje' => 'Se ha reenviado el correo de verificación. Por favor, revisa tu bandeja de entrada.',
         ], 200);
     }
->>>>>>> aa3ae93a5c9dfd9da6589a60aaf0ad09b9f47d5c
 
      // =====[ Activacion de la cuenta ]=====
 
