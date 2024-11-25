@@ -18,9 +18,9 @@ use App\Http\Controllers\RecorridoController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
 
 
@@ -38,7 +38,7 @@ use App\Http\Controllers\RecorridoController;
         Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
 
         // ===[ Middleware |Tiene que estar logueado| ]===
-        Route::middleware(['auth:sanctum'])->group(function () {
+        Route::middleware(['auth:api'])->group(function () {
             
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear

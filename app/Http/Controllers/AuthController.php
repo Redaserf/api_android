@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -21,7 +22,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
+            'email' => 'required|string|email',//NO agarra la validacion jasd
             'password' => 'required|string',
         ], [
             'email.required' => 'El campo email es obligatorio.',
@@ -33,17 +34,17 @@ class AuthController extends Controller
             return response()->json([
                 'mensaje' => 'Error en la validación de los datos.',
                 'errores' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!JWTAuth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'mensaje' => 'Credenciales inválidas'
             ], 401);
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = JWTAuth::user();
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'token' => $token
@@ -88,7 +89,7 @@ class AuthController extends Controller
             return response()->json([
                 'mensaje' => 'Error en la validación de los datos.',
                 'errores' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
         $user = Usuario::create([
@@ -100,7 +101,7 @@ class AuthController extends Controller
         ]);
 
         // Enviar email de activacion
-        $this->sendActivationEmail($user);
+        // $this->sendActivationEmail($user);
 
         return response()->json([
             'mensaje' => 'Usuario creado con éxito.',
