@@ -15,13 +15,20 @@ class RecorridoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        //recycler de los recorridos ya hechos de cada usuario
         //
-        $recorridos = Recorrido::all();
+        $recorridos = Recorrido::select('created_at', 'velocidad_maxima',
+         'velocidad_promedio', 'temperatura',
+            'calorias', 'distancia_recorrida', 
+                'tiempo')
+        ->where('usuario_id', $request->user()->id)
+        ->with('bicicleta')
+        ->get();
 
         return response()->json([
-            'mensaje' => 'Todo salio bien',
+            'mensaje' => 'Todo salió bien',
             'recorridos' => $recorridos
         ], 200);
     }

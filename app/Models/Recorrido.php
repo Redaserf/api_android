@@ -11,9 +11,9 @@ class Recorrido extends Model
 
     
     protected $table = 'recorridos';
-    protected $fillable = 
+    protected $fillable =
     ['calorias', 'tiempo', 'velocidad_promedio',
-     'velocidad_maxima', 'ditancia_recorrida', 
+     'velocidad_maxima', 'ditancia_recorrida',
      'usuario_id', 'bicicleta_id'];
 
     public function usuario(){

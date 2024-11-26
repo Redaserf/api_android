@@ -37,14 +37,14 @@ class AuthController extends Controller
             ], 422);
         }
 
-        if (!JWTAuth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'mensaje' => 'Credenciales inválidas'
             ], 401);
         }
 
-        $user = JWTAuth::user();
-        $token = JWTAuth::fromUser($user);
+        $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'token' => $token
