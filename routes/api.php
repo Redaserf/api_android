@@ -18,11 +18,12 @@ use App\Http\Controllers\RecorridoController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
     return $request->user();
 });
 
 
+Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
 
     Route::prefix("v1/")->group(function(){
 
@@ -44,7 +45,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
             Route::put('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
             Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis
-            Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
             Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
         
             // ===[ Recorridos ]===

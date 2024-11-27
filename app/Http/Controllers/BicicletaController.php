@@ -66,6 +66,7 @@ class BicicletaController extends Controller
             'usuario_id' => $request->user()->id
         ]);
 
+
         return response()->json([
             'mensaje' => 'Se creo correctamente la bici',
             'bici' => $bici
