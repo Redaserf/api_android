@@ -58,6 +58,7 @@ class RecorridoController extends Controller
             'velocidad_promedio' => 'numeric',
             'velocidad_maxima' => 'numeric',
             'distancia_recorrida' => 'numeric',
+            'temperatura' => 'numeric',
             'bicicleta_id' => ['required', Rule::exists('bicicletas', 'id')->where(function($bici) use($request){
                 //Que la bici exista en las bicis del usuario
                 $bici->where('usuario_id', $request->user()->id);
@@ -76,6 +77,7 @@ class RecorridoController extends Controller
             'bicicleta_id.required' => 'El id de la bicicleta es obligatorio',
             'bicicleta_id.exists' => 'Esta bicicleta no le pertenece al usuario o no existe',
             
+            'temperatura.numeric' => 'La temperatura debe ser de tipo double',
             
 
         ]);
@@ -94,6 +96,7 @@ class RecorridoController extends Controller
             'velocidad_maxima' => $request->velocidad_maxima,
             'distancia_recorrida' => $request->distancia_recorrida,
             'usuario_id' => $request->user()->id,
+            'temperatura' => $request->temperatura,
             'bicicleta_id' => $request->bicicleta_id
         ]);
 

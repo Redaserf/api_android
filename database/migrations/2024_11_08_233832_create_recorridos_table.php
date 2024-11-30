@@ -22,7 +22,7 @@ return new class extends Migration
             $table->double('velocidad_promedio')->nullable()->default(0.0);
             $table->double('velocidad_maxima')->nullable()->default(0.0);
             $table->double('distancia_recorrida')->nullable()->default(0.0);
-            $table->double('temperatura');
+            $table->double('temperatura')->nullable()->default(0.0);
             $table->foreign('usuario_id')->references('id')->on('usuarios');
             $table->foreign('bicicleta_id')->references('id')->on('bicicletas');
             $table->softDeletes();

@@ -21,7 +21,7 @@ class BicicletaController extends Controller
 
         return response()->json([
             'mensaje' => 'Todo salio bien',
-            'bicicletas' => $bicis
+            'bicicletas' => $bicis->load('recorridos')
         ]);
     }
 

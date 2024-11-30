@@ -12,7 +12,7 @@ class Bicicleta extends Model
     protected $fillable = ['nombre', 'usuario_id'];
 
     public function recorridos(){
-        return $this->hasMany(Recorrido::class, 'bici_id');
+        return $this->hasMany(Recorrido::class, 'bicicleta_id');
     }
 
     public function usuario(){

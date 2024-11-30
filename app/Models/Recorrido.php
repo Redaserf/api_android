@@ -14,7 +14,7 @@ class Recorrido extends Model
     protected $fillable =
     ['calorias', 'tiempo', 'velocidad_promedio',
      'velocidad_maxima', 'ditancia_recorrida',
-     'usuario_id', 'bicicleta_id'];
+     'usuario_id', 'bicicleta_id', 'temperatura'];
 
     public function usuario(){
         return $this->belongsTo(Usuario::class, 'usuario_id');
