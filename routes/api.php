@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdafruitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BicicletaController;
 use Illuminate\Http\Request;
@@ -57,8 +58,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         });
 
     });
-        
-
+    
+    
+    // Traer datos de los sensores
+    Route::get('/adafruit', [AdafruitController::class, 'obtenerDatos']);
 
     // == [ Re-envio de contra] ==
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');
