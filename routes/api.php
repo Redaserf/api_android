@@ -6,7 +6,7 @@ use App\Http\Controllers\BicicletaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecorridoController;
-
+use App\Http\Controllers\UsuarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,14 +32,21 @@ use App\Http\Controllers\RecorridoController;
         // ===[ Users ]===
         Route::post('register', [AuthController::class,'register']);
         Route::post('login', [AuthController::class,'login']);
-        Route::post('logout', [AuthController::class,'logout']);
         
         // ===[ Activar cuenta y reenviar email ]===
         Route::post('reenviar', [AuthController::class,'reenviar']);
         Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
 
+
         // ===[ Middleware |Tiene que estar logueado| ]===
         Route::middleware(['auth:sanctum'])->group(function () {
+
+            // ===[ Auth ]===
+            Route::post('logout', [AuthController::class,'logout']);
+
+            // ===[ Usuarios ]===
+            Route::put('usuario', [UsuarioController::class, 'actualizar']);
+            Route::get('usuario', [UsuarioController::class, 'show']);
             
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
@@ -51,7 +58,7 @@ use App\Http\Controllers\RecorridoController;
             // ===[ Recorridos ]===
             Route::post('recorrido', [RecorridoController::class, 'store']); // Crear
             Route::put('recorrido/{id}', [RecorridoController::class, 'update'])->where('id', '[0-9]+'); // Editar
-            Route::get('recorridos', [RecorridoController::class, 'index']); // Traer todos los recorridos
+            Route::get('recorridos', [RecorridoController::class, 'index']); // Traer todos los recorridos (por usuario)
             Route::get('recorrido/{id}', [RecorridoController::class, 'show'])->where('id', '[0-9]+'); // Traer un recorrido
             Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy'])->where('id', '[0-9]+'); // Eliminar un recorrido
             
@@ -65,4 +72,4 @@ use App\Http\Controllers\RecorridoController;
 
     // == [ Re-envio de contra] ==
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');
-Route::post('v1/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
+    Route::post('v1/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');

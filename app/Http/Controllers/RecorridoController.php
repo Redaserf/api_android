@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Recorrido;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -15,16 +16,17 @@ class RecorridoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
-        $recorridos = Recorrido::all();
+    
+    // public function index()
+    // {
+    //     //
+    //     $recorridos = Recorrido::all();
 
-        return response()->json([
-            'mensaje' => 'Todo salio bien',
-            'recorridos' => $recorridos
-        ], 200);
-    }
+    //     return response()->json([
+    //         'mensaje' => 'Todo salio bien',
+    //         'recorridos' => $recorridos
+    //     ], 200);
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -217,4 +219,36 @@ class RecorridoController extends Controller
             ], 404);
         }
     }
+
+    public function index()
+    {
+        $usuario = Auth::user();
+    
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+    
+        $recorridos = $usuario->recorridos()
+            ->with('bicicleta')
+            ->get()
+            ->map(function ($recorrido) {
+                return [
+                    'bicicleta_nombre' => $recorrido->bicicleta->nombre ?? 'Sin nombre',
+                    'calorias' => $recorrido->calorias,
+                    'tiempo' => $recorrido->tiempo,
+                    'velocidad_promedio' => $recorrido->velocidad_promedio,
+                    'velocidad_maxima' => $recorrido->velocidad_maxima,
+                    'distancia_recorrida' => $recorrido->distancia_recorrida,
+                    'created_at' => $recorrido->created_at->toDateTimeString(),
+                ];
+            });
+    
+        return response()->json([
+            'message' => 'Recorridos obtenidos con éxito',
+            'recorridos' => $recorridos,
+        ], 200);
+    }
+    
+    
+
 }

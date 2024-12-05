@@ -23,6 +23,7 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'nombre',
         'apellido',
+        'peso',
         'email',
         'password',
         'rol_id',
@@ -57,7 +58,7 @@ class Usuario extends Authenticatable
     }
 
     public function recorridos(){
-        return $this->hasMany(Bicicleta::class, 'usuario_id');
-    }
+        return $this->hasMany(Recorrido::class, 'usuario_id');
+    }    
 
 }

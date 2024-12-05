@@ -46,7 +46,9 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'token' => $token
+            'token' => $token,
+            'message' => 'Sesión iniciada con éxito',
+            'user' => $user
         ], 200);
     }
 
@@ -68,6 +70,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50',
             'apellido' => 'required|string|max:100',
+            'peso' => 'required|numeric|between:20,150',
             'email' => 'required|email|max:255|unique:usuarios',
             'password' => 'required|min:8',
         ], [
@@ -75,6 +78,9 @@ class AuthController extends Controller
             'nombre.max' => 'El nombre no puede exceder los 50 caracteres.',
             'apellido.required' => 'El campo apellido es obligatorio.',
             'apellido.max' => 'El nombre no puede exceder los 100 caracteres.',
+            'peso.required' => 'El campo peso es obligatorio.',
+            'peso.numeric' => 'El peso debe ser un número.',
+            'peso.between' => 'El peso debe estar entre 20kg y 150kg.',
             'email.required' => 'El campo email es obligatorio.',
             'email.email' => 'El email no es válido.',
             'email.max' => 'El email no puede exceder los 255 caracteres.',
@@ -93,6 +99,7 @@ class AuthController extends Controller
         $user = Usuario::create([
             'nombre' => $request->nombre,
             'apellido' => $request->apellido,
+            'peso' => $request->peso,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'rol_id' => 1
@@ -101,9 +108,12 @@ class AuthController extends Controller
         // Enviar email de activacion
         $this->sendActivationEmail($user);
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'mensaje' => 'Usuario creado con éxito.',
-            'usuario' => $user
+            'usuario' => $user,
+            'token' => $token
         ], 201);
 
     }
