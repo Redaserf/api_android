@@ -47,6 +47,9 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
             // ===[ Usuarios ]===
             Route::put('usuario', [UsuarioController::class, 'actualizar']);
             Route::get('usuario', [UsuarioController::class, 'show']);
+
+            // ===[ Adafruit ]===
+            Route::get('/adafruit', [AdafruitController::class, 'obtenerDatos']);
             
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
@@ -66,9 +69,6 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
 
     });
     
-    
-    // Traer datos de los sensores
-    Route::get('/adafruit', [AdafruitController::class, 'obtenerDatos']);
 
     // == [ Re-envio de contra] ==
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');

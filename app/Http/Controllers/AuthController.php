@@ -103,11 +103,11 @@ class AuthController extends Controller
             'peso' => $request->peso,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            // 'rol_id' => 1 (se supone que debe ser guest)
+            'rol_id' => 1
         ]);
 
         // Enviar email de activacion
-        // $this->sendActivationEmail($user);
+        $this->sendActivationEmail($user);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
