@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('apellido');
             $table->string('email')->unique();
+            $table->decimal('peso', 8, 2);
             $table->unsignedBigInteger('rol_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
