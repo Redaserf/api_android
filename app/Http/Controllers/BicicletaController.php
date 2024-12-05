@@ -176,7 +176,7 @@ class BicicletaController extends Controller
 
             return response()->json([
                 'mensaje' => 'Se elimino correctamente la bici',
-                'bici' => $bici
+                'bicicleta' => $bici
             ], 200);
 
         }else{
