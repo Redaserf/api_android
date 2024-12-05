@@ -11,10 +11,10 @@ class Recorrido extends Model
 
     
     protected $table = 'recorridos';
-    protected $fillable = 
+    protected $fillable =
     ['calorias', 'tiempo', 'velocidad_promedio',
-     'velocidad_maxima', 'ditancia_recorrida', 
-     'usuario_id', 'bicicleta_id'];
+     'velocidad_maxima', 'ditancia_recorrida',
+     'usuario_id', 'bicicleta_id', 'temperatura'];
 
     public function usuario(){
         return $this->belongsTo(Usuario::class, 'usuario_id');

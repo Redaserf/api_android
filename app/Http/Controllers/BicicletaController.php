@@ -14,14 +14,14 @@ class BicicletaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $bicis = Bicicleta::all();
+        $bicis = Bicicleta::where('usuario_id', $request->user()->id)->get();
 
         return response()->json([
             'mensaje' => 'Todo salio bien',
-            'bicis' => $bicis
+            'bicicletas' => $bicis->load('recorridos')
         ]);
     }
 
@@ -65,6 +65,7 @@ class BicicletaController extends Controller
             'nombre' => $request->nombre,
             'usuario_id' => $request->user()->id
         ]);
+
 
         return response()->json([
             'mensaje' => 'Se creo correctamente la bici',

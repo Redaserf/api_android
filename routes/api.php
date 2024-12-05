@@ -19,11 +19,12 @@ use App\Http\Controllers\UsuarioController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
+    return $request->user();
+});
 
 
+Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
 
     Route::prefix("v1/")->group(function(){
 
@@ -36,7 +37,6 @@ use App\Http\Controllers\UsuarioController;
         // ===[ Activar cuenta y reenviar email ]===
         Route::post('reenviar', [AuthController::class,'reenviar']);
         Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
-
 
         // ===[ Middleware |Tiene que estar logueado| ]===
         Route::middleware(['auth:sanctum'])->group(function () {
@@ -51,14 +51,14 @@ use App\Http\Controllers\UsuarioController;
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
             Route::put('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
-            Route::get('bicicletas', [BicicletaController::class, 'index']); // Traer todas las bicis
-            Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
+            Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis
             Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
         
             // ===[ Recorridos ]===
             Route::post('recorrido', [RecorridoController::class, 'store']); // Crear
             Route::put('recorrido/{id}', [RecorridoController::class, 'update'])->where('id', '[0-9]+'); // Editar
-            Route::get('recorridos', [RecorridoController::class, 'index']); // Traer todos los recorridos (por usuario)
+            Route::get('recorridos', [RecorridoController::class, 'recorridosUsuario']); // Traer todos los recorridos (por usuario)
+            Route::get('recorrido', [RecorridoController::class, 'index']); // Traer todos los recorridos, este es el de hugo
             Route::get('recorrido/{id}', [RecorridoController::class, 'show'])->where('id', '[0-9]+'); // Traer un recorrido
             Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy'])->where('id', '[0-9]+'); // Eliminar un recorrido
             

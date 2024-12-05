@@ -21,7 +21,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
+            'email' => 'required|string|email',//NO agarra la validacion jasd
             'password' => 'required|string',
         ], [
             'email.required' => 'El campo email es obligatorio.',
@@ -33,7 +33,7 @@ class AuthController extends Controller
             return response()->json([
                 'mensaje' => 'Error en la validación de los datos.',
                 'errores' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
         if (!Auth::attempt($request->only('email', 'password'))) {
@@ -52,7 +52,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-      // =====[ Salir de la sesión ]=====
+      // =====[ Log out ]=====
+
 
     public function logout(Request $request)
     {
@@ -93,7 +94,7 @@ class AuthController extends Controller
             return response()->json([
                 'mensaje' => 'Error en la validación de los datos.',
                 'errores' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
         $user = Usuario::create([
@@ -102,11 +103,11 @@ class AuthController extends Controller
             'peso' => $request->peso,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'rol_id' => 1
+            // 'rol_id' => 1 (se supone que debe ser guest)
         ]);
 
         // Enviar email de activacion
-        $this->sendActivationEmail($user);
+        // $this->sendActivationEmail($user);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -115,7 +116,6 @@ class AuthController extends Controller
             'usuario' => $user,
             'token' => $token
         ], 201);
-
     }
 
 
@@ -182,20 +182,16 @@ class AuthController extends Controller
 
      // =====[ Activacion de la cuenta ]=====
 
+
     public function activate($id, Request $request)
     {
         $user = Usuario::findOrFail($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'Cuenta no encontrada.']);
-        }
 
         if (!$request->hasValidSignature()) {
             return response()->json(['message' => 'Enlace de activación inválido o expirado.'], 403);
         }
        
         $user->email_verified_at = now();
-        $user->rol_id = 2;
         $user->save();
 
         return response()->json(['message' => 'Cuenta activada exitosamente.']);

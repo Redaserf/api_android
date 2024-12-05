@@ -16,17 +16,24 @@ class RecorridoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    
-    // public function index()
-    // {
-    //     //
-    //     $recorridos = Recorrido::all();
 
-    //     return response()->json([
-    //         'mensaje' => 'Todo salio bien',
-    //         'recorridos' => $recorridos
-    //     ], 200);
-    // }
+    public function index(Request $request)
+    {
+        //recycler de los recorridos ya hechos de cada usuario
+        //
+        $recorridos = Recorrido::select('created_at', 'velocidad_maxima',
+         'velocidad_promedio', 'temperatura',
+            'calorias', 'distancia_recorrida', 
+                'tiempo')
+        ->where('usuario_id', $request->user()->id)
+        ->with('bicicleta')
+        ->get();
+
+        return response()->json([
+            'mensaje' => 'Todo salió bien',
+            'recorridos' => $recorridos
+        ], 200);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -53,6 +60,7 @@ class RecorridoController extends Controller
             'velocidad_promedio' => 'numeric',
             'velocidad_maxima' => 'numeric',
             'distancia_recorrida' => 'numeric',
+            'temperatura' => 'numeric',
             'bicicleta_id' => ['required', Rule::exists('bicicletas', 'id')->where(function($bici) use($request){
                 //Que la bici exista en las bicis del usuario
                 $bici->where('usuario_id', $request->user()->id);
@@ -71,6 +79,7 @@ class RecorridoController extends Controller
             'bicicleta_id.required' => 'El id de la bicicleta es obligatorio',
             'bicicleta_id.exists' => 'Esta bicicleta no le pertenece al usuario o no existe',
             
+            'temperatura.numeric' => 'La temperatura debe ser de tipo double',
             
 
         ]);
@@ -89,6 +98,7 @@ class RecorridoController extends Controller
             'velocidad_maxima' => $request->velocidad_maxima,
             'distancia_recorrida' => $request->distancia_recorrida,
             'usuario_id' => $request->user()->id,
+            'temperatura' => $request->temperatura,
             'bicicleta_id' => $request->bicicleta_id
         ]);
 
@@ -220,7 +230,7 @@ class RecorridoController extends Controller
         }
     }
 
-    public function index()
+    public function recorridosUsuario()
     {
         $usuario = Auth::user();
     
