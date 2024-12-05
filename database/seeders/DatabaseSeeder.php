@@ -5,7 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UsuarioSeeder;
-
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,5 +27,19 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UsuarioSeeder::class);
         $this->call(RolesSeeder::class);
+
+        DB::table('bicicletas')->insert([
+            'nombre' => 'pepe',
+            'usuario_id' => 1
+        ]);
+        DB::table('bicicletas')->insert([
+            'nombre' => 'juan',
+            'usuario_id'=> 1
+        ]);
+        DB::table('bicicletas')->insert([
+            'nombre' => 'tangamandapio',
+            'usuario_id' => 1
+        ]);
+
     }
 }
