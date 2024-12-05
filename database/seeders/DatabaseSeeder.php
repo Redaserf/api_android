@@ -27,19 +27,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UsuarioSeeder::class);
         $this->call(RolesSeeder::class);
-
-        DB::table('bicicletas')->insert([
-            'nombre' => 'pepe',
-            'usuario_id' => 1
-        ]);
-        DB::table('bicicletas')->insert([
-            'nombre' => 'juan',
-            'usuario_id'=> 1
-        ]);
-        DB::table('bicicletas')->insert([
-            'nombre' => 'tangamandapio',
-            'usuario_id' => 1
-        ]);
+        $this->call(BicisSeeder::class);
 
     }
 }
