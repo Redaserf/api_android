@@ -89,6 +89,8 @@ class BicicletaController extends Controller
 
         $path = Storage::disk('public')->put('images', $request->imagen);
 
+        
+
 
         $bici = Bicicleta::create([
             'nombre' => $request->nombre,
