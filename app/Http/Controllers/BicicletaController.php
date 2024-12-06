@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Bicicleta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use League\CommonMark\Environment\Environment;
 
+use function PHPSTORM_META\map;
 
 class BicicletaController extends Controller
 {
@@ -21,6 +24,11 @@ class BicicletaController extends Controller
         //
         $bicis = Bicicleta::where('usuario_id', $request->user()->id)->get();
 
+        $bicis = $bicis->map(function ($bici) {
+                $bici->imagen = config('app_url.url') . Storage::url($bici->imagen);
+            return $bici;
+        });        
+
         return response()->json([
             'mensaje' => 'Todo salio bien',
             'bicicletas' => $bicis->load('recorridos')
@@ -30,8 +38,7 @@ class BicicletaController extends Controller
     public function imagen(Request $request, $id){
 
         $bici = Bicicleta::findOrFail($id);
-
-        $imagen = Storage::get($bici->imagen);
+        $imagen = Storage::disk('public')->get($bici->imagen);
 
         return response($imagen, 200, [
             'Content-Type' => 'image/png'
@@ -60,7 +67,7 @@ class BicicletaController extends Controller
         //
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'required|string|max: 60',
-            'imagen' => 'required|file|image|mimes:png,jpg',
+            'imagen' => 'required|file|image',
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
@@ -80,14 +87,14 @@ class BicicletaController extends Controller
             ], 422);
         }
 
-        $path = Storage::disk('local')->put("bici_imagen", $request->imagen);
+        $path = Storage::disk('public')->put('images', $request->imagen);
+
 
         $bici = Bicicleta::create([
             'nombre' => $request->nombre,
             'imagen' => $path,
             'usuario_id' => $request->user()->id
         ]);
-
 
         return response()->json([
             'mensaje' => 'Se creo correctamente la bici',
@@ -142,7 +149,7 @@ class BicicletaController extends Controller
         //
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'string|max: 60',
-            'imagen' => 'file|image|mimes:png,jpg'
+            'imagen' => 'file|image'
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
@@ -162,17 +169,18 @@ class BicicletaController extends Controller
                 'errores' => $validaciones->errors()
             ], 422);
         }
-
         
         $bici = Bicicleta::findOrFail($id);
-       
-       
         
         if($bici){
             
             $path = null;
-            if($request->imagen){
-                $path = Storage::disk('local')->put($bici->imagen, $request->imagen);
+            if($bici->imagen && $request->imagen){
+                Storage::disk('public')->delete($bici->imagen);
+                $path = Storage::disk('public')->put('images', $request->imagen);
+            }
+            else if($request->imagen){
+                $path = Storage::disk('public')->put('images', $request->imagen);
             }
             
             $bici->nombre = $request->nombre ? $request->nombre : $bici->nombre;
@@ -203,7 +211,7 @@ class BicicletaController extends Controller
         $bici = Bicicleta::findOrFail($id);
 
         if($bici){
-            Storage::disk('local')->delete($bici->imagen);
+            Storage::disk('public')->delete($bici->imagen);
             $bici->delete();
 
             return response()->json([
