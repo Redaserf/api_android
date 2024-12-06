@@ -27,6 +27,18 @@ class BicicletaController extends Controller
         ]);
     }
 
+    public function imagen(Request $request, $id){
+
+        $bici = Bicicleta::findOrFail($id);
+
+        $imagen = Storage::get($bici->imagen);
+
+        return response($imagen, 200, [
+            'Content-Type' => 'image/png'
+        ]);
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -158,6 +170,7 @@ class BicicletaController extends Controller
         
         if($bici){
             
+            $path = null;
             if($request->imagen){
                 $path = Storage::disk('local')->put($bici->imagen, $request->imagen);
             }

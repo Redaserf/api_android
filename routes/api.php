@@ -53,7 +53,8 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
             
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
-            Route::put('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
+            Route::post('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
+            Route::get('imagen/{id}', [BicicletaController::class, 'imagen']);
             Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis
             Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
         
