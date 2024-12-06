@@ -158,7 +158,7 @@ class BicicletaController extends Controller
         
         if($bici){
             
-            if($request->hasFile('imagen')){
+            if($request->imagen){
                 $path = Storage::disk('local')->put($bici->imagen, $request->imagen);
             }
             
