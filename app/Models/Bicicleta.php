@@ -9,7 +9,7 @@ class Bicicleta extends Model
 {
     use HasFactory;
     protected $table = 'bicicletas';
-    protected $fillable = ['nombre', 'usuario_id'];
+    protected $fillable = ['nombre', 'usuario_id', 'imagen'];
 
     public function recorridos(){
         return $this->hasMany(Recorrido::class, 'bicicleta_id');

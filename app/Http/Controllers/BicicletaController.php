@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Bicicleta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -46,10 +48,15 @@ class BicicletaController extends Controller
         //
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'required|string|max: 60',
+            'imagen' => 'required|file|image|mimes:png,jpg',
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
             'nombre.max' => 'El nombre debe ser de menos de 60 caracteres',
+
+            'imagen.required' => 'La imagen es requerida',
+            'imagen.file' => 'La imagen debe ser un archivo',
+            'imagen.mimes' =>  'La imagen debe ser de tipo png o jpg',
 
         ]);
 
@@ -61,8 +68,11 @@ class BicicletaController extends Controller
             ], 422);
         }
 
+        $path = Storage::disk('local')->put("bici_imagen", $request->imagen);
+
         $bici = Bicicleta::create([
             'nombre' => $request->nombre,
+            'imagen' => $path,
             'usuario_id' => $request->user()->id
         ]);
 
@@ -71,8 +81,6 @@ class BicicletaController extends Controller
             'mensaje' => 'Se creo correctamente la bici',
             'bici' => $bici
         ], 201);
-
-
     }
 
     /**
@@ -121,11 +129,16 @@ class BicicletaController extends Controller
     {
         //
         $validaciones = Validator::make($request->all(), [
-            'nombre' => 'required|string|max: 60'
+            'nombre' => 'string|max: 60',
+            'imagen' => 'file|image|mimes:png,jpg'
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
             'nombre.max' => 'El nombre debe ser de menos de 60 caracteres',
+
+            'imagen.required' => 'La imagen es requerida',
+            'imagen.file' => 'La imagen debe ser un archivo',
+            'imagen.mimes' =>  'La imagen debe ser de tipo png o jpg',
 
         ]);
 
@@ -137,13 +150,19 @@ class BicicletaController extends Controller
             ], 422);
         }
 
+        
         $bici = Bicicleta::findOrFail($id);
+       
+       
         
         if($bici){
             
-            $bici->update([
-                'nombre' => $request->nombre
-            ]);
+            if($request->hasFile('imagen')){
+                $path = Storage::disk('local')->put($bici->imagen, $request->imagen);
+            }
+            
+            $bici->nombre = $request->nombre ? $request->nombre : $bici->nombre;
+            $bici->imagen = $path ? $path : $bici->imagen;
             $bici->save();
 
             return response()->json([
@@ -167,11 +186,10 @@ class BicicletaController extends Controller
     public function destroy($id)
     {
         //
-
         $bici = Bicicleta::findOrFail($id);
 
         if($bici){
-
+            Storage::disk('local')->delete($bici->imagen);
             $bici->delete();
 
             return response()->json([
