@@ -152,7 +152,7 @@ class BicicletaController extends Controller
         //
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'string|max: 60',
-            'imagen' => 'file|image|max:2048'
+            'imagen' => 'file|image|max:10000'
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
@@ -162,7 +162,7 @@ class BicicletaController extends Controller
             'imagen.file' => 'La imagen debe ser un archivo',
             'imagen.image' => 'La imagen debe ser una imagen',
             'imagen.mimes' =>  'La imagen debe ser de tipo png o jpg',
-            'imagen.max' => 'La imagen debe pesar menos de 2 megabytes'
+            'imagen.max' => 'La imagen debe pesar menos de 2 mb'
 
 
         ]);
