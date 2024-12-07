@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecorridoController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\VelocidadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +50,7 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
             Route::get('usuario', [UsuarioController::class, 'show']);
 
             // ===[ Adafruit ]===
-            Route::get('/adafruit', [AdafruitController::class, 'obtenerDatos']);
+            Route::post('adafruit', [AdafruitController::class, 'obtenerDatos']);
             
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
@@ -64,7 +65,12 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
             Route::get('recorrido', [RecorridoController::class, 'index']); // Traer todos los recorridos, este es el de hugo
             Route::get('recorrido/{id}', [RecorridoController::class, 'show'])->where('id', '[0-9]+'); // Traer un recorrido
             Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy'])->where('id', '[0-9]+'); // Eliminar un recorrido
+            Route::get('recorridos/semana', [RecorridoController::class, 'recorridosPorSemana']);
+            Route::get('recorridos/mes', [RecorridoController::class, 'recorridosPorMes']);
             
+            // ===[ Velocidades ]===
+            Route::post('velocidades', [VelocidadController::class, 'eliminarVelocidades']);
+
         });
 
     });
