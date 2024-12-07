@@ -77,7 +77,6 @@ class BicicletaController extends Controller
 
             'imagen.required' => 'La imagen es requerida',
             'imagen.file' => 'La imagen debe ser un archivo',
-            'imagen.mimes' =>  'La imagen debe ser de tipo png o jpg',
 
         ]);
 
