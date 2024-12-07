@@ -69,7 +69,7 @@ class BicicletaController extends Controller
 
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'required|string|max: 60',
-            'imagen' => 'required|file|image|mime:jpg,jpeg,png',
+            'imagen' => 'required|file|image|mimes:jpg,jpeg,png',
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
