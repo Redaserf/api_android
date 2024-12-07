@@ -6,6 +6,7 @@ use App\Models\Bicicleta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use League\CommonMark\Environment\Environment;
@@ -65,6 +66,7 @@ class BicicletaController extends Controller
     public function store(Request $request)
     {
         //
+
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'required|string|max: 60',
             'imagen' => 'required|file|image',
@@ -78,7 +80,6 @@ class BicicletaController extends Controller
             'imagen.mimes' =>  'La imagen debe ser de tipo png o jpg',
 
         ]);
-
 
         if($validaciones->fails()){
             return response()->json([
