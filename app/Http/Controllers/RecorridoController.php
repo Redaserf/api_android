@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use Carbon\Carbon;
 
 class RecorridoController extends Controller
 {
@@ -51,64 +51,40 @@ class RecorridoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
-        $validaciones = Validator::make($request->all(), [
-            'calorias' => 'numeric',
-            'tiempo' => 'date_format:H:i:s',
-            'velocidad_promedio' => 'numeric',
-            'velocidad_maxima' => 'numeric',
-            'distancia_recorrida' => 'numeric',
-            'temperatura' => 'numeric',
-            'bicicleta_id' => ['required', Rule::exists('bicicletas', 'id')->where(function($bici) use($request){
-                //Que la bici exista en las bicis del usuario
-                $bici->where('usuario_id', $request->user()->id);
-            })]
-        ], [
-            'calorias.numeric' => 'El campo calorias debe ser de tipo double',
 
-            'tiempo.date_format' => 'El campo tiempo debe ser con el formato HH::MM::SS',
+     public function store(Request $request)
+     {
+         try {
+             $request->validate([
+                 'bicicleta_id' => 'required|exists:bicicletas,id',
+             ]);
+     
+             $usuario_id = Auth::id();
+     
+             $recorrido = Recorrido::create([
+                 'usuario_id' => $usuario_id,
+                 'bicicleta_id' => $request->bicicleta_id,
+                 'calorias' => 0,
+                 'tiempo' => 0,
+                 'velocidad_promedio' => 0,
+                 'velocidad_maxima' => 0,
+                 'distancia_recorrida' => 0,
+                 'temperatura' => 0,
+             ]);
+     
+             return response()->json([
+                 'message' => 'Recorrido creado correctamente.',
+                 'recorrido_id' => $recorrido->id,
+             ], 201);
+         } catch (\Exception $e) {
+             return response()->json([
+                 'error' => 'Error al crear el recorrido',
+                 'details' => $e->getMessage(),
+             ], 500);
+         }
+     }
+     
 
-            'velocidad_promedio' => 'La velocidad promedio debe ser de tipo double',
-            
-            'velocidad_maxima' => 'La velocidad maxima debe ser de tipo double',
-
-            'distancia_recorrida' => 'La distancia recorrida debe ser de tipo double',
-
-            'bicicleta_id.required' => 'El id de la bicicleta es obligatorio',
-            'bicicleta_id.exists' => 'Esta bicicleta no le pertenece al usuario o no existe',
-            
-            'temperatura.numeric' => 'La temperatura debe ser de tipo double',
-            
-
-        ]);
-
-        if($validaciones->fails()){
-            return response()->json([
-                'mensaje' => 'Error en la validacion de los datos',
-                'errores' => $validaciones->errors()
-            ], 422);
-        }
-
-        $recorrido = Recorrido::create([
-            'calorias' => $request->calorias,
-            'tiempo' => $request->tiempo,
-            'velocidad_promedio' => $request->velocidad_promedio,
-            'velocidad_maxima' => $request->velocidad_maxima,
-            'distancia_recorrida' => $request->distancia_recorrida,
-            'usuario_id' => $request->user()->id,
-            'temperatura' => $request->temperatura,
-            'bicicleta_id' => $request->bicicleta_id
-        ]);
-
-        return response()->json([
-            'mensaje' => 'Se creo correctamente el recorrido',
-            'recorrido' => $recorrido
-        ], 201);
-
-
-    }
 
     /**
      * Display the specified resource.
@@ -230,6 +206,8 @@ class RecorridoController extends Controller
         }
     }
 
+    // =======================================================================================
+
     public function recorridosUsuario()
     {
         $usuario = Auth::user();
@@ -259,6 +237,70 @@ class RecorridoController extends Controller
         ], 200);
     }
     
+    public function recorridosPorSemana()
+    {
+        $usuario = Auth::user();
     
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+    
+        $hoy = Carbon::now()->endOfDay();
+        $haceUnaSemana = Carbon::now()->subDays(7)->startOfDay();
+    
+        $recorridos = $usuario->recorridos()
+            ->whereBetween('created_at', [$haceUnaSemana, $hoy])
+            ->with('bicicleta')
+            ->get()
+            ->map(function ($recorrido) {
+                return [
+                    'bicicleta_nombre' => $recorrido->bicicleta->nombre ?? 'Sin nombre',
+                    'calorias' => $recorrido->calorias,
+                    'tiempo' => $recorrido->tiempo,
+                    'velocidad_promedio' => $recorrido->velocidad_promedio,
+                    'velocidad_maxima' => $recorrido->velocidad_maxima,
+                    'distancia_recorrida' => $recorrido->distancia_recorrida,
+                    'created_at' => $recorrido->created_at->toDateTimeString(),
+                ];
+            });
+    
+        return response()->json([
+            'message' => 'Recorridos de la última semana obtenidos con éxito',
+            'recorridos' => $recorridos,
+        ], 200);
+    }
+    
+    public function recorridosPorMes()
+    {
+        $usuario = Auth::user();
+    
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+    
+        $hoy = Carbon::now()->endOfDay();
+        $haceUnMes = Carbon::now()->subDays(30)->startOfDay();
+    
+        $recorridos = $usuario->recorridos()
+            ->whereBetween('created_at', [$haceUnMes, $hoy])
+            ->with('bicicleta')
+            ->get()
+            ->map(function ($recorrido) {
+                return [
+                    'bicicleta_nombre' => $recorrido->bicicleta->nombre ?? 'Sin nombre',
+                    'calorias' => $recorrido->calorias,
+                    'tiempo' => $recorrido->tiempo,
+                    'velocidad_promedio' => $recorrido->velocidad_promedio,
+                    'velocidad_maxima' => $recorrido->velocidad_maxima,
+                    'distancia_recorrida' => $recorrido->distancia_recorrida,
+                    'created_at' => $recorrido->created_at->toDateTimeString(),
+                ];
+            });
+    
+        return response()->json([
+            'message' => 'Recorridos del último mes obtenidos con éxito',
+            'recorridos' => $recorridos,
+        ], 200);
+    }    
 
 }

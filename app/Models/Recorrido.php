@@ -13,7 +13,7 @@ class Recorrido extends Model
     protected $table = 'recorridos';
     protected $fillable =
     ['calorias', 'tiempo', 'velocidad_promedio',
-     'velocidad_maxima', 'ditancia_recorrida',
+     'velocidad_maxima', 'distancia_recorrida',
      'usuario_id', 'bicicleta_id', 'temperatura'];
 
     public function usuario(){
@@ -22,6 +22,11 @@ class Recorrido extends Model
 
     public function bicicleta(){
         return $this->belongsTo(Bicicleta::class, 'bicicleta_id');
+    }
+
+    public function velocidades()
+    {
+        return $this->hasMany(Velocidad::class, 'recorrido_id');
     }
 
 }
