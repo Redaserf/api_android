@@ -24,11 +24,7 @@ class BicicletaController extends Controller
     {
         //
         $bicis = Bicicleta::where('usuario_id', $request->user()->id)->get();
-
-        $bicis = $bicis->map(function ($bici) {
-                $bici->imagen = config('app_url.url') . Storage::url($bici->imagen);
-            return $bici;
-        });        
+   
 
         return response()->json([
             'mensaje' => 'Todo salio bien',
@@ -96,9 +92,10 @@ class BicicletaController extends Controller
 
         $bici = Bicicleta::create([
             'nombre' => $request->nombre,
-            'imagen' => $path,
+            'imagen' => config("app_url.url") . Storage::url($path),
             'usuario_id' => $request->user()->id
         ]);
+
 
         return response()->json([
             'mensaje' => 'Se creo correctamente la bici',
@@ -176,7 +173,9 @@ class BicicletaController extends Controller
             
             $path = null;
             if($bici->imagen && $request->imagen){
-                Storage::disk('public')->delete($bici->imagen);
+                $rutaRelativa = str_replace( config("app_url.url") . "/storage/", "", $bici->imagen);
+
+                Storage::disk('public')->delete($rutaRelativa);
                 $path = Storage::disk('public')->put('images', $request->imagen);
             }
             else if($request->imagen){
@@ -184,8 +183,10 @@ class BicicletaController extends Controller
             }
             
             $bici->nombre = $request->nombre ? $request->nombre : $bici->nombre;
-            $bici->imagen = $path ? $path : $bici->imagen;
+            $bici->imagen = $path ? config("app_url.url") . Storage::url($path) : $bici->imagen;
             $bici->save();
+
+
 
             return response()->json([
                 'mensaje' => 'Se edito correctamente la bici',
@@ -211,7 +212,9 @@ class BicicletaController extends Controller
         $bici = Bicicleta::findOrFail($id);
 
         if($bici){
-            Storage::disk('public')->delete($bici->imagen);
+            $rutaRelativa = str_replace( config("app_url.url") . "/storage/", "", $bici->imagen);
+
+            Storage::disk('public')->delete($rutaRelativa);
             $bici->delete();
 
             return response()->json([
