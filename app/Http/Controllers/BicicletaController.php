@@ -53,81 +53,56 @@ class BicicletaController extends Controller
         //
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
-        Log::info('Inicio del método store');
-    
-        // Log para inspeccionar los datos del request
-        Log::info('Datos del request:', $request->all());
-    
+        //
+        Log::info($request->imagen);
         $validaciones = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:60',
+            'nombre' => 'required|string|max: 60',
             'imagen' => 'required|file|image|mimes:jpg,jpeg,png',
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
             'nombre.max' => 'El nombre debe ser de menos de 60 caracteres',
-    
+
             'imagen.required' => 'La imagen es requerida',
             'imagen.file' => 'La imagen debe ser un archivo',
             'imagen.mimes' => 'La imagen debe ser de tipo PNG o JPG',
+
+
         ]);
-    
-        // Log para ver si la validación falló
-        if ($validaciones->fails()) {
-            Log::error('Validación fallida:', $validaciones->errors()->toArray());
+
+        if($validaciones->fails()){
             return response()->json([
                 'mensaje' => 'Error en la validacion de los datos',
                 'errores' => $validaciones->errors()
             ], 422);
         }
-    
-        try {
-            // Log antes de guardar la imagen
-            Log::info('Intentando guardar la imagen...');
-            $path = Storage::disk('public')->put('images', $request->file('imagen'));
-    
-            // Log después de guardar la imagen
-            Log::info('Imagen guardada en:', ['path' => $path]);
-        } catch (\Exception $e) {
-            // Log de error en caso de que falle la subida de la imagen
-            Log::error('Error al subir la imagen:', ['exception' => $e->getMessage()]);
-            return response()->json([
-                'mensaje' => 'Error al subir la imagen',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    
-        try {
-            // Log antes de crear el registro en la base de datos
-            Log::info('Creando el registro de bicicleta en la base de datos...');
-            $bici = Bicicleta::create([
-                'nombre' => $request->nombre,
-                'imagen' => config("app.url") . Storage::url($path),
-                'usuario_id' => $request->user()->id
-            ]);
-    
-            // Log después de crear el registro
-            Log::info('Registro creado correctamente:', $bici->toArray());
-        } catch (\Exception $e) {
-            // Log de error si falla la creación del registro
-            Log::error('Error al crear el registro de la bicicleta:', ['exception' => $e->getMessage()]);
-            return response()->json([
-                'mensaje' => 'Error al crear la bicicleta',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    
-        // Log final de éxito
-        Log::info('Bicicleta creada con éxito:', ['bicicleta' => $bici]);
-    
+
+        $path = Storage::disk('public')->put('images', $request->imagen);
+
+        
+
+
+        $bici = Bicicleta::create([
+            'nombre' => $request->nombre,
+            'imagen' => config("app_url.url") . Storage::url($path),
+            'usuario_id' => $request->user()->id
+        ]);
+
+
         return response()->json([
-            'mensaje' => 'Se creó correctamente la bici',
+            'mensaje' => 'Se creo correctamente la bici',
             'bicicleta' => $bici
         ], 201);
     }
-    
+
     /**
      * Display the specified resource.
      *
