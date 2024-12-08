@@ -182,10 +182,6 @@ class BicicletaController extends Controller
             else if($request->imagen){
                 $path = Storage::disk('public')->put('images', $request->imagen);
             }
-
-            return response()->json([
-                'msg' => $request->nombre
-            ]);
             
             $bici->nombre = $request->nombre ? $request->nombre : $bici->nombre;
             $bici->imagen = $path ? $path : $bici->imagen;
