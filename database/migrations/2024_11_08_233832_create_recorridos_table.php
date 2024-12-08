@@ -24,7 +24,7 @@ return new class extends Migration
             $table->double('distancia_recorrida')->nullable()->default(0.0);
             $table->double('temperatura')->nullable()->default(0.0);
             $table->foreign('usuario_id')->references('id')->on('usuarios');
-            $table->foreign('bicicleta_id')->references('id')->on('bicicletas');
+            $table->foreign('bicicleta_id')->references('id')->on('bicicletas')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
