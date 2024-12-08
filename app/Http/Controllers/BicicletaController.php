@@ -99,7 +99,7 @@ class BicicletaController extends Controller
 
         return response()->json([
             'mensaje' => 'Se creo correctamente la bici',
-            'bici' => $bici
+            'bicicleta' => $bici
         ], 201);
     }
 
@@ -118,7 +118,7 @@ class BicicletaController extends Controller
         if($bici){
             return response()->json([
                 'mensaje' => 'Todo salio bien',
-                'bici' => $bici
+                'bicicleta' => $bici
             ], 200);
         }else{
             return response()->json([
