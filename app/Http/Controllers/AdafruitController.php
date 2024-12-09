@@ -133,7 +133,7 @@ class AdafruitController extends Controller
         $ay = floatval($ay);
         $az = floatval($az);
 
-        $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2) + pow($az, 2));
+        $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2));
         return $aceleracion * 3.6; // Convertir de m/s a km/h
     }
 
