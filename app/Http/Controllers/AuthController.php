@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
+use User;
 
 class AuthController extends Controller
 {
@@ -21,39 +23,50 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',//NO agarra la validacion jasd
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ], [
             'email.required' => 'El campo email es obligatorio.',
             'email.email' => 'El email no es válido.',
             'password.required' => 'El campo contraseña es obligatorio.',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'mensaje' => 'Error en la validación de los datos.',
                 'errores' => $validator->errors()
             ], 422);
         }
-
+    
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'mensaje' => 'Credenciales inválidas'
             ], 401);
         }
-
+    
         $user = Auth::user();
+    
+        // Verificar si el usuario aún no ha verificado su correo
+        if ($user->email_verified_at == null) {
+            return response()->json([
+                'mensaje' => 'El correo aún no ha sido verificado. Por favor, ingresa el código de verificación.',
+                'redirect' => 'verify_code',
+                'email' => $user->email,
+            ], 403);
+        }
+    
         $token = $user->createToken('auth_token')->plainTextToken;
-
+    
         return response()->json([
             'token' => $token,
             'message' => 'Sesión iniciada con éxito',
             'user' => $user
         ], 200);
     }
+    
+
 
       // =====[ Log out ]=====
-
 
     public function logout(Request $request)
     {
@@ -64,10 +77,12 @@ class AuthController extends Controller
         ], 200);
     }
 
+
     // =====[ Registro de usuario ]=====
 
     public function register(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50',
             'apellido' => 'required|string|max:100',
@@ -97,17 +112,20 @@ class AuthController extends Controller
             ], 422);
         }
 
+        $codigo = rand(100000, 999999);
+
         $user = Usuario::create([
             'nombre' => $request->nombre,
             'apellido' => $request->apellido,
             'peso' => $request->peso,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'codigo' => $codigo,
             'rol_id' => 1
         ]);
 
         // Enviar email de activacion
-        $this->sendActivationEmail($user);
+        $this->sendActivationEmail($user, $codigo);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -117,24 +135,70 @@ class AuthController extends Controller
             'token' => $token
         ], 201);
     }
+    
+
+    // =====[ Verificar correo ]=====
+
+    public function verificarCodigo(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|exists:usuarios,email',
+            'codigo' => 'required|numeric|digits:6',
+        ], [
+            'email.required' => 'El campo email es obligatorio.',
+            'email.exists' => 'El usuario con este email no existe.',
+            'codigo.required' => 'El campo código es obligatorio.',
+            'codigo.numeric' => 'El código debe ser un número.',
+            'codigo.digits' => 'El código debe tener exactamente 6 dígitos.',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'mensaje' => 'Error en la validación de los datos.',
+                'errores' => $validator->errors(),
+            ], 422);
+        }
+    
+        $user = Usuario::where('email', $request->email)->firstOrFail();
+    
+        if ($user->codigo !== $request->codigo) {
+            return response()->json([
+                'mensaje' => 'El código proporcionado es incorrecto.',
+            ], 400);
+        }
+    
+        $user->email_verified_at = now();
+        $user->rol_id = 2;
+        $user->codigo = null;
+        $user->save();
+    
+        // Crear un token de autenticación
+        $token = $user->createToken('auth_token')->plainTextToken;
+    
+        return response()->json([
+            'mensaje' => 'Código verificado correctamente. El usuario ahora está activo.',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'nombre' => $user->nombre,
+                'email' => $user->email,
+            ],
+        ], 200);
+    }    
 
 
-    // =====[ Envio de correo ]=====
+    // =====[ Envío de correo ]=====
 
-    public function sendActivationEmail(Usuario $user){
-        $url = URL::temporarySignedRoute(
-            'activation.verify', now()->addMinutes(60), ['id' => $user->id]
-        );
+    public function sendActivationEmail(Usuario $user, $codigo){
 
         $correo = $user->email;
 
         try {
-            Mail::to($user->email)->send(new CreaciondeCuenta($url,$correo));
+            Mail::to($user->email)->send(new CreaciondeCuenta($correo, $codigo));
             
         } catch (\Exception $e) {
             return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
         }
-
     }
 
 
@@ -180,8 +244,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-     // =====[ Activacion de la cuenta ]=====
 
+     // =====[ Activacion de la cuenta ]=====
 
     public function activate($id, Request $request)
     {

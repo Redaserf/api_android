@@ -22,6 +22,7 @@ class UsuarioSeeder extends Seeder
             'apellido' => 'josejuan',
             'email' => 'dev@gmail.com',
             'peso' => '60.32',
+            'codigo' => '000000',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
 
