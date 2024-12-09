@@ -13,7 +13,7 @@ class AdafruitController extends Controller
 {
     public function obtenerDatos(Request $request)
     {
-        $url = "https://io.adafruit.com/api/v2/Aldebaran0987Integradora/groups/default/feeds";
+        $url = "https://io.adafruit.com/api/v2/Aldebaran0987Integradora/groups/1/feeds";
         $apiKey = config("adafruit_token.key");
     
         // Validar el recorrido_id y tiempo enviados desde el cliente

@@ -125,12 +125,12 @@
 													<table class="heading_block block-5" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 														<tr>
 															<td class="pad" style="padding-left:10px;padding-right:10px;text-align:center;width:100%;">
-																<h1 style="margin: 0; color: #ffffff; direction: ltr; font-family: Fira Sans, Lucida Sans Unicode, Lucida Grande, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 69.6px;"><span class="tinyMce-placeholder" style="word-break: break-word;">GRACIAS POR CREAR TU CUENTA EN NUESTRA APP</span></h1>
+																<h1 style="margin: 0; color: #ffffff; direction: ltr; font-family: Fira Sans, Lucida Sans Unicode, Lucida Grande, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 69.6px;"><span class="tinyMce-placeholder" style="word-break: break-word;">GRACIAS POR CREAR TU CUENTA</span></h1>
 															</td>
 														</tr>
                                                         <tr>
 															<td class="pad" style="padding-left:10px;padding-right:10px;text-align:center;width:100%;">
-																<h1 style="margin: 0; color: #ffffff; direction: ltr; font-family: Fira Sans, Lucida Sans Unicode, Lucida Grande, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 60px; margin-bottom: 0; mso-line-height-alt: 69.6px;"><span class="tinyMce-placeholder" style="word-break: break-word;">PARA LA CONFIRMACION DE TU CUENTA HAZ CLICK EN EL SIGUIENTE ENLACE PARA CONFIRMAR EL CORREO {{$correo}}</span></h1>
+																<h1 style="margin: 0; color: #ffffff; direction: ltr; font-family: Fira Sans, Lucida Sans Unicode, Lucida Grande, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 60px; margin-bottom: 0; mso-line-height-alt: 69.6px;"><span class="tinyMce-placeholder" style="word-break: break-word;">PARA CONFIRMAR LA CUENTA {{$correo}}, INGRESA EL SIGUIENTE CÓDIGO EN LA APP</span></h1>
 															</td>
 														</tr>
                                                         <tr>
@@ -139,7 +139,7 @@
                                                         </tr>
                                                         <tr>
 															<td class="pad" style="padding-left:10px;padding-right:10px;text-align:center;width:100%;">
-																<h1 style="margin: 0; color: #ffffff; direction: ltr; font-family: Fira Sans, Lucida Sans Unicode, Lucida Grande, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 60px; margin-bottom: 0; mso-line-height-alt: 69.6px;"><span class="tinyMce-placeholder" style="word-break: break-word;"><a href="{{$url}}">Confirmar cuenta</a></span></h1>
+																<h1 style="margin: 0; color: #ffffff; direction: ltr; font-family: Fira Sans, Lucida Sans Unicode, Lucida Grande, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 60px; margin-bottom: 0; mso-line-height-alt: 69.6px;"><span class="tinyMce-placeholder" style="word-break: break-word;">{{$codigo}}</span></h1>
 															</td>
 														</tr>
 													</table>

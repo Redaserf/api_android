@@ -14,26 +14,26 @@ class CreaciondeCuenta extends Mailable
     use Queueable, SerializesModels;
 
     public $correo;
-    public $url;
+    public $codigo;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($correo,$url)
+    public function __construct($correo, $codigo)
     {
         //
         $this->correo = $correo;
-        $this->url = $url;
+        $this->codigo = $codigo;
     }
 
     public function build()
     {
         return $this->view('emails.notifiacioncuenta')
-                    ->subject('Creacion de Cuenta')
+                    ->subject('Verificar Cuenta')
                     ->with(['correo' => $this->correo,
-                'url'=>$this->url]);
+                'url'=>$this->codigo]);
     }
 
 
