@@ -33,7 +33,7 @@ class AuthController extends Controller
     
         if ($validator->fails()) {
             return response()->json([
-                'mensaje' => 'Error en la validación de los datos.',
+                'mensaje' => 'Credenciales inválidas.',
                 'errores' => $validator->errors()
             ], 422);
         }
@@ -127,12 +127,9 @@ class AuthController extends Controller
         // Enviar email de activacion
         $this->sendActivationEmail($user, $codigo);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'mensaje' => 'Usuario creado con éxito.',
-            'usuario' => $user,
-            'token' => $token
+            'usuario' => $user
         ], 201);
     }
     
@@ -204,45 +201,42 @@ class AuthController extends Controller
 
     public function reenviar(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'email' => 'required|email|exists:usuarios,email',
         ], [
             'email.required' => 'El campo email es obligatorio.',
-            'email.email' => 'Debe proporcionar un email válido.',
-            'email.exists' => 'No existe un usuario registrado con ese email.',
+            'email.email' => 'El email debe ser válido.',
+            'email.exists' => 'No se encontró un usuario con este email.',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'mensaje' => 'Error en la validación de los datos',
-                'errores' => $validator->errors()
-            ], 400);
-        }
-
-        $user = Usuario::where('email', $request->email)->first();
-
+    
+        $email = $request->email;
+    
+        $user = Usuario::where('email', $email)->first();
+    
         if ($user->hasVerifiedEmail()) {
-            return response()->json(['mensaje' => 'El correo ya ha sido verificado anteriormente.'], 200);
+            return response()->json([
+                'mensaje' => 'El correo ya ha sido verificado anteriormente.'
+            ], 200);
         }
-
-        $url = URL::temporarySignedRoute(
-            'activation.verify', now()->addMinutes(30), ['id' => $user->id]
-        );
-
+    
+        $codigo = rand(100000, 999999);
+    
         try {
-
-            Mail::to($user->email)->send(new CreaciondeCuenta($url, $user->email));
-            
+            Mail::to($user->email)->send(new CreaciondeCuenta($codigo, $user->email));
+    
+            $user->codigo = $codigo;
+            $user->save();
         } catch (\Exception $e) {
-
-            return response()->json(['error' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
-
+            return response()->json([
+                'error' => 'No se pudo enviar el correo: ' . $e->getMessage()
+            ], 500);
         }
-
+    
         return response()->json([
-            'mensaje' => 'Se ha reenviado el correo de verificación. Por favor, revisa tu bandeja de entrada.',
+            'mensaje' => 'Se ha reenviado el correo de verificación.',
         ], 200);
     }
+    
 
 
      // =====[ Activacion de la cuenta ]=====
