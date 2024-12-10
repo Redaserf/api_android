@@ -33,16 +33,16 @@ class BicicletaController extends Controller
         ]);
     }
 
-    public function imagen(Request $request, $id){
+    // public function imagen(Request $request, $id){
 
-        $bici = Bicicleta::findOrFail($id);
-        $imagen = Storage::disk('public')->get($bici->imagen);
+    //     $bici = Bicicleta::findOrFail($id);
+    //     $imagen = Storage::disk('public')->get($bici->imagen);
 
-        return response($imagen, 200, [
-            'Content-Type' => 'image/png'
-        ]);
+    //     return response($imagen, 200, [
+    //         'Content-Type' => 'image/png'
+    //     ]);
 
-    }
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -66,14 +66,14 @@ class BicicletaController extends Controller
     
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'required|string|max:60',
-            'imagen' => 'required|file|image|mimes:jpg,jpeg,png',
+            // 'imagen' => 'required|file|image|mimes:jpg,jpeg,png',
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
             'nombre.max' => 'El nombre debe ser de menos de 60 caracteres',
-            'imagen.required' => 'La imagen es requerida',
-            'imagen.file' => 'La imagen debe ser un archivo',
-            'imagen.mimes' => 'La imagen debe ser de tipo PNG o JPG',
+            // 'imagen.required' => 'La imagen es requerida',
+            // 'imagen.file' => 'La imagen debe ser un archivo',
+            // 'imagen.mimes' => 'La imagen debe ser de tipo PNG o JPG',
         ]);
     
         if ($validaciones->fails()) {
@@ -84,12 +84,12 @@ class BicicletaController extends Controller
         }
     
         // Guardar la imagen en el almacenamiento público
-        $path = Storage::disk('public')->put('images', $request->imagen);
+        // $path = Storage::disk('public')->put('images', $request->imagen);
     
         // Crear la bici en la base de datos
         $bici = Bicicleta::create([
             'nombre' => $request->nombre,
-            'imagen' => config("app_url.url") . Storage::url($path),
+            // 'imagen' => config("app_url.url") . Storage::url($path),
             'usuario_id' => $request->user()->id
         ]);
     
@@ -160,13 +160,13 @@ class BicicletaController extends Controller
         //
         $validaciones = Validator::make($request->all(), [
             'nombre' => 'string|max: 60',
-            'imagen' => 'file|image|mimes:jpg,jpeg,png',
+            // 'imagen' => 'file|image|mimes:jpg,jpeg,png',
         ], [
             'nombre.string' => 'El nombre debe ser de tipo string',
             'nombre.max' => 'El nombre debe ser de menos de 60 caracteres',
 
-            'imagen.file' => 'La imagen debe ser un archivo',
-            'imagen.mimes' => 'La imagen debe ser de tipo PNG, JPG o JPEG',
+            // 'imagen.file' => 'La imagen debe ser un archivo',
+            // 'imagen.mimes' => 'La imagen debe ser de tipo PNG, JPG o JPEG',
         ]);
 
 
@@ -181,19 +181,19 @@ class BicicletaController extends Controller
         
         if($bici){
             
-            $path = null;
-            if($bici->imagen && $request->imagen){
-                $rutaRelativa = str_replace( config("app_url.url") . "/storage/", "", $bici->imagen);
+            // $path = null;
+            // if($bici->imagen && $request->imagen){
+            //     $rutaRelativa = str_replace( config("app_url.url") . "/storage/", "", $bici->imagen);
 
-                Storage::disk('public')->delete($rutaRelativa);
-                $path = Storage::disk('public')->put('images', $request->imagen);
-            }
-            else if($request->imagen){
-                $path = Storage::disk('public')->put('images', $request->imagen);
-            }
+            //     Storage::disk('public')->delete($rutaRelativa);
+            //     $path = Storage::disk('public')->put('images', $request->imagen);
+            // }
+            // else if($request->imagen){
+            //     $path = Storage::disk('public')->put('images', $request->imagen);
+            // }
             
             $bici->nombre = $request->nombre ? $request->nombre : $bici->nombre;
-            $bici->imagen = $path ? config("app_url.url") . Storage::url($path) : $bici->imagen;
+            // $bici->imagen = $path ? config("app_url.url") . Storage::url($path) : $bici->imagen;
             $bici->save();
 
 
@@ -222,9 +222,9 @@ class BicicletaController extends Controller
         $bici = Bicicleta::findOrFail($id);
 
         if($bici){
-            $rutaRelativa = str_replace( config("app_url.url") . "/storage/", "", $bici->imagen);
+            // $rutaRelativa = str_replace( config("app_url.url") . "/storage/", "", $bici->imagen);
 
-            Storage::disk('public')->delete($rutaRelativa);
+            // Storage::disk('public')->delete($rutaRelativa);
             $bici->delete();
 
             return response()->json([
