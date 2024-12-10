@@ -6,6 +6,7 @@ use App\Models\Bicicleta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -61,44 +62,53 @@ class BicicletaController extends Controller
      */
     public function store(Request $request)
     {
-        //
         Log::info($request->imagen);
+    
         $validaciones = Validator::make($request->all(), [
-            'nombre' => 'required|string|max: 60',
+            'nombre' => 'required|string|max:60',
             'imagen' => 'required|file|image|mimes:jpg,jpeg,png',
         ], [
             'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
             'nombre.max' => 'El nombre debe ser de menos de 60 caracteres',
-
             'imagen.required' => 'La imagen es requerida',
             'imagen.file' => 'La imagen debe ser un archivo',
             'imagen.mimes' => 'La imagen debe ser de tipo PNG o JPG',
-
-
         ]);
-
-        if($validaciones->fails()){
+    
+        if ($validaciones->fails()) {
             return response()->json([
-                'mensaje' => 'Error en la validacion de los datos',
+                'mensaje' => 'Error en la validación de los datos',
                 'errores' => $validaciones->errors()
             ], 422);
         }
-
+    
+        // Guardar la imagen en el almacenamiento público
         $path = Storage::disk('public')->put('images', $request->imagen);
-
-        
-
-
+    
+        // Crear la bici en la base de datos
         $bici = Bicicleta::create([
             'nombre' => $request->nombre,
             'imagen' => config("app_url.url") . Storage::url($path),
             'usuario_id' => $request->user()->id
         ]);
-
-
+    
+        $apiKey = config('adafruit_token.key');
+        $username = 'Aldebaran0987Integradora';
+    
+        try {
+            Http::withHeaders([
+                'X-AIO-Key' => $apiKey,
+            ])->post("https://io.adafruit.com/api/v2/{$username}/groups", [
+                'name' => $bici->nombre,
+                'description' => "Grupo asociado a la bici {$bici->nombre}",
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error al crear el grupo en Adafruit IO: {$e->getMessage()}");
+        }
+    
         return response()->json([
-            'mensaje' => 'Se creo correctamente la bici',
+            'mensaje' => 'Se creó correctamente la bici',
             'bicicleta' => $bici
         ], 201);
     }
