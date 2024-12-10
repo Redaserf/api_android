@@ -28,8 +28,7 @@ class AuthController extends Controller
         ], [
             'email.required' => 'El campo email es obligatorio.',
             'email.email' => 'El email no es válido.',
-            'password.required' => 'El campo contraseña es obligatorio.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.'
+            'password.required' => 'El campo contraseña es obligatorio.'
         ]);
     
         if ($validator->fails()) {
