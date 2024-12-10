@@ -26,11 +26,8 @@ class ArduinoController extends Controller
             ]);
         }
 
-        // dd($ip_arduino);
-        $encender = $request->encender;
-
-        // dd(config("adafruit_token.key"));
-        
+  
+      
         $response = Http::withHeaders([
             "X-AIO-Key" => config("adafruit_token.key")
         ])->put($ip_arduino, [
@@ -43,12 +40,12 @@ class ArduinoController extends Controller
 
             if($response->json()['description'] == "1"){ 
                 return response()->json([
-                    'msg' => 1
+                    'luz' => 1
                 ]);
             }
 
             return response()->json([
-                'msg' => 0
+                'luz' => 0
             ]);
         }else{
             return response()->json([
