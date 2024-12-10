@@ -43,12 +43,12 @@ class ArduinoController extends Controller
 
             if($response->json()['description'] == "1"){ 
                 return response()->json([
-                    'msg' => 'Se encendio la luz de la bicicleta'
+                    'msg' => 1
                 ]);
             }
 
             return response()->json([
-                'msg' => 'Se apago la luz de la bicicleta'
+                'msg' => 0
             ]);
         }else{
             return response()->json([
