@@ -222,7 +222,7 @@ class AuthController extends Controller
         $codigo = rand(100000, 999999);
     
         try {
-            Mail::to($user->email)->send(new CreaciondeCuenta($codigo, $user->email));
+            Mail::to($user->email)->send(new CreaciondeCuenta($user->email,$codigo));
     
             $user->codigo = $codigo;
             $user->save();
