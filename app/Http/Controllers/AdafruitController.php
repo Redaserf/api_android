@@ -15,59 +15,56 @@ class AdafruitController extends Controller
     {
         $url = "https://io.adafruit.com/api/v2/Aldebaran0987Integradora/groups/default/feeds";
         $apiKey = config("adafruit_token.key");
-    
-        // Validar el recorrido_id y tiempo enviados desde el cliente
+
         $request->validate([
             'recorrido_id' => 'required|exists:recorridos,id',
             'tiempo' => 'required|string',
         ]);
-    
+
         $recorridoId = $request->recorrido_id;
         $tiempo = $request->tiempo;
         $usuario = auth()->user();
         $pesoUsuario = $usuario->peso;
-    
+
         Log::info("Tiempo traído de Android: {$tiempo}");
         Log::info("Peso del usuario: {$pesoUsuario}");
-    
+
         try {
+            // =====[ Obtener datos de Adafruit ]=====
             $response = Http::withHeaders([
                 'X-AIO-Key' => $apiKey,
             ])->get($url);
-    
+
             if ($response->successful()) {
                 $feeds = $response->json();
-    
+
+                $temperatura = $this->getFeedValue($feeds, 'temperatura');
                 $acelerometroX = $this->getFeedValue($feeds, 'acelerometro-x');
                 $acelerometroY = $this->getFeedValue($feeds, 'acelerometro-y');
                 $acelerometroZ = $this->getFeedValue($feeds, 'acelerometro-z');
-                $temperatura = $this->getFeedValue($feeds, 'temperatura');
-    
+
                 if ($acelerometroX !== null && $acelerometroY !== null && $acelerometroZ !== null) {
                     $velocidad = $this->calcularVelocidad($acelerometroX, $acelerometroY, $acelerometroZ);
-    
+
+
                     Log::info("Velocidad calculada: {$velocidad}");
                     Log::info("Temperatura obtenida: {$temperatura}");
-    
+
                     Velocidad::create([
                         'recorrido_id' => $recorridoId,
                         'valor' => $velocidad,
                     ]);
-    
-                    // Convertir tiempo a horas para el cálculo
+
                     [$horas, $minutos, $segundos] = explode(':', $tiempo);
-                    $tiempoHoras = ($horas * 3600 + $minutos * 60 + $segundos) / 3600;
-    
-                    // Calcular la distancia y las calorías quemadas
-                    $distancia = $this->calcularDistancia($tiempo, $velocidad);
+                    $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
+                    $distanciaIncremental = $this->calcularDistanciaIncremental($velocidad, 5); // Intervalo de 5 segundos
+                    $tiempoHoras = $tiempoSegundos / 3600;
                     $caloriasQuemadas = $this->calcularCalorias($pesoUsuario, $velocidad, $tiempoHoras);
-    
-                    // Actualizar las métricas del recorrido
-                    $this->actualizarVelocidadesRecorrido($recorridoId, $tiempo, $distancia, $caloriasQuemadas, $temperatura);
-    
-                    // Obtener las velocidades actualizadas
+
+                    $this->actualizarVelocidadesRecorrido($recorridoId, $tiempo, $distanciaIncremental, $caloriasQuemadas, $temperatura);
+
                     $recorrido = Recorrido::findOrFail($recorridoId);
-    
+
                     return response()->json([
                         'success' => true,
                         'message' => 'Datos obtenidos y procesados correctamente.',
@@ -100,6 +97,7 @@ class AdafruitController extends Controller
         }
     }
 
+    // =====[ Calcular las calorías quemadas según velocidad y peso ]=====
     private function calcularCalorias($pesoUsuario, $velocidadPromedio, $tiempoHoras)
     {
         if ($velocidadPromedio <= 8) {
@@ -119,12 +117,14 @@ class AdafruitController extends Controller
         return $met * $pesoUsuario * $tiempoHoras;
     }
 
+    // =====[ Obtener el último valor de un feed ]=====
     private function getFeedValue($feeds, $key)
     {
         $feed = collect($feeds)->firstWhere('key', $key);
         return $feed['last_value'] ?? null;
     }
 
+    // =====[ Calcular la velocidad a partir de los ejes X, Y y Z ]=====
     private function calcularVelocidad($ax, $ay, $az)
     {
         Log::info("Valores de acelerómetro: X={$ax}, Y={$ay}, Z={$az}");
@@ -134,41 +134,42 @@ class AdafruitController extends Controller
         $az = floatval($az);
 
         $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2) + pow($az, 2));
-        return $aceleracion * 3.6; // Convertir de m/s a km/h
+
+        return $aceleracion * 3.6;
     }
 
-    private function calcularDistancia($tiempo, $velocidad)
+
+    // =====[ Calcular la distancia incremental en kilómetros ]=====
+    private function calcularDistanciaIncremental($velocidadActual, $tiempoSegundos)
     {
-        // Convertir tiempo en formato 00:00:00 a segundos
-        [$horas, $minutos, $segundos] = explode(':', $tiempo);
-        $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
-
-        Log::info("Tiempo ya procesado: {$tiempoSegundos}");
-
-        // Calcular distancia (velocidad en km/h * tiempo en horas)
-        $tiempoHoras = $tiempoSegundos / 3600;
-        return $velocidad * $tiempoHoras;
+        $velocidadEnMS = $velocidadActual / 3.6;
+        $distanciaRecorrida = $velocidadEnMS * $tiempoSegundos;
+        return $distanciaRecorrida / 1000; // Retornar en kilómetros
     }
 
-    private function actualizarVelocidadesRecorrido($recorridoId, $tiempo, $distancia, $caloriasQuemadas, $temperatura)
+    // =====[ Actualizar métricas acumulativas del recorrido ]=====
+    private function actualizarVelocidadesRecorrido($recorridoId, $tiempo, $distanciaIncremental, $caloriasQuemadas, $temperatura)
     {
+        $recorrido = Recorrido::findOrFail($recorridoId);
+
+        $distanciaTotal = $recorrido->distancia_recorrida + $distanciaIncremental;
+
         $velocidades = Velocidad::where('recorrido_id', $recorridoId)->pluck('valor');
-    
+
         if ($velocidades->isNotEmpty()) {
             $velocidadMaxima = $velocidades->max();
             $velocidadPromedio = $velocidades->avg();
-    
-            Recorrido::where('id', $recorridoId)->update([
+
+            $recorrido->update([
                 'velocidad_maxima' => $velocidadMaxima,
                 'velocidad_promedio' => $velocidadPromedio,
-                'distancia_recorrida' => $distancia ?? 0,
+                'distancia_recorrida' => $distanciaTotal,
                 'tiempo' => $tiempo,
                 'calorias' => $caloriasQuemadas,
                 'temperatura' => $temperatura,
             ]);
-            Log::info("Distancia actualizada en recorrido: {$distancia}");
-            Log::info("Calorías actualizadas en recorrido: {$caloriasQuemadas}");
-            Log::info("Temperatura actualizada en recorrido: {$temperatura}");
+
+            Log::info("Distancia actualizada: {$distanciaTotal}");
         }
-    }    
+    }
 }

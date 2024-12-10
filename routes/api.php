@@ -38,7 +38,8 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
         
         // ===[ Activar cuenta y reenviar email ]===
         Route::post('reenviar', [AuthController::class,'reenviar']);
-        Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
+        Route::post('send', [AuthController::class, 'verificarCodigo']);
+        // Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
 
         // ===[ Middleware |Tiene que estar logueado| ]===
         Route::middleware(['auth:sanctum'])->group(function () {
@@ -80,6 +81,6 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
     });
     
 
-    // == [ Re-envio de contra] ==
+    // == [ Re-envio de contra - DLC] ==
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');
     Route::post('v1/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
