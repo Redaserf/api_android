@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdafruitController;
+use App\Http\Controllers\ArduinoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BicicletaController;
 use Illuminate\Http\Request;
@@ -71,6 +72,8 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
             
             // ===[ Velocidades ]===
             Route::post('velocidades', [VelocidadController::class, 'eliminarVelocidades']);
+
+            Route::post('encender/luz', [ArduinoController::class, 'encenderMatriz']);
 
         });
 
