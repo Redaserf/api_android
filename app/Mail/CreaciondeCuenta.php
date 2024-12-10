@@ -30,7 +30,7 @@ class CreaciondeCuenta extends Mailable
 
     public function build()
     {
-        return $this->view('emails.notifiacioncuenta')
+        return $this->view('Emails.notifiacioncuenta')
                     ->subject('Verificar Cuenta')
                     ->with(['correo' => $this->correo,
                 'url'=>$this->codigo]);
