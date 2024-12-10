@@ -29,15 +29,37 @@ class ArduinoController extends Controller
         // dd($ip_arduino);
         $encender = $request->encender;
 
-        $response = Http::asForm()->post($ip_arduino, [
-            "encender" => $encender
+        // dd(config("adafruit_token.key"));
+        
+        $response = Http::withHeaders([
+            "X-AIO-Key" => config("adafruit_token.key")
+        ])->put($ip_arduino, [
+            'feed' => [
+                        'description' => $request->encender
+            ]  
         ]);
 
+        if($response->successful()){
+
+            if($response->json()['description'] == "1"){ 
+                return response()->json([
+                    'msg' => 'Se encendio la luz de la bicicleta'
+                ]);
+            }
+
+            return response()->json([
+                'msg' => 'Se apago la luz de la bicicleta'
+            ]);
+        }else{
+            return response()->json([
+                'msg' => 'No se pudo editar el feed',
+                'error' => $response->json()
+            ], 500);
+        }
 
 
-        return response()->json([
-            'data' => $response->json()
-        ]);
+        // $data = $response->json()['last_value'];
+
 
     }
 
