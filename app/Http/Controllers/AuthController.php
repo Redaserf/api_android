@@ -24,7 +24,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string',
         ], [
             'email.required' => 'El campo email es obligatorio.',
             'email.email' => 'El email no es válido.',
