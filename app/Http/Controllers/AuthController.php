@@ -24,11 +24,12 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
-            'password' => 'required|string',
+            'password' => 'required|string|min:8',
         ], [
             'email.required' => 'El campo email es obligatorio.',
             'email.email' => 'El email no es válido.',
             'password.required' => 'El campo contraseña es obligatorio.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.'
         ]);
     
         if ($validator->fails()) {
