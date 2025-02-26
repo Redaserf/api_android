@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdafruitController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArduinoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BicicletaController;
@@ -24,6 +25,12 @@ use App\Http\Controllers\VelocidadController;
 Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
     return $request->user();
 });
+
+//todos los usuarios
+Route::get('v1/admin/usuarios', [AdminController::class, 'todosLosUsuarios']);
+
+//usuario con sus bicicletas
+Route::get('v1/admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicleta'])->where('id', '[0-9]+');//
 
 
 Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici

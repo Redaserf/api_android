@@ -23,6 +23,53 @@ class UsuarioSeeder extends Seeder
             'email' => 'dev@gmail.com',
             'peso' => '60.32',
             'codigo' => '000000',
+            'rol_id' => 3,
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+
+        ]);
+
+        DB::table('usuarios')->insert([
+            'nombre' => 'pepe',
+            'apellido' => 'josejuan',
+            'email' => 'jas4@gmail.com',
+            'peso' => '60.32',
+            'codigo' => '000000',
+            'rol_id' => 2,
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+
+        ]);
+
+        DB::table('usuarios')->insert([
+            'nombre' => 'pepe',
+            'apellido' => 'josejuan',
+            'email' => 'jas3@gmail.com',
+            'peso' => '60.32',
+            'codigo' => '000000',
+            'rol_id' => 2,
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+
+        ]);
+        DB::table('usuarios')->insert([
+            'nombre' => 'pepe',
+            'apellido' => 'josejuan',
+            'email' => 'jas2@gmail.com',
+            'peso' => '60.32',
+            'codigo' => '000000',
+            'rol_id' => 2,
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+
+        ]);
+        DB::table('usuarios')->insert([
+            'nombre' => 'pepe',
+            'apellido' => 'josejuan',
+            'email' => 'jas@gmail.com',
+            'peso' => '60.32',
+            'codigo' => '000000',
+            'rol_id' => 2,
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
 

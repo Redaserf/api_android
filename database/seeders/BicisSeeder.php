@@ -28,6 +28,18 @@ class BicisSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'usuario_id' => 2,
+                'nombre' => 'Bicicleta Max',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'usuario_id' => 2,
+                'nombre' => 'Bicicleta Aarón',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }
