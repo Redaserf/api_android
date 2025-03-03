@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use FuncInfo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -95,6 +96,8 @@ class UsuarioController extends Controller
             ],
         ], 200);
     }
+
+
     
     
 }

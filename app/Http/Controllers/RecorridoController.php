@@ -54,6 +54,7 @@ class RecorridoController extends Controller
 
      public function store(Request $request)
      {
+        // dd(config('database.connections.mongodb'));
          try {
              $request->validate([
                  'bicicleta_id' => 'required|exists:bicicletas,id',
@@ -62,13 +63,13 @@ class RecorridoController extends Controller
              $usuario_id = Auth::id();
      
              $recorrido = Recorrido::create([
-                 'usuario_id' => $usuario_id,
+                 'usuario' => ['_id' => $usuario_id, 'rol_id' => Auth::user()->rol_id],
                  'bicicleta_id' => $request->bicicleta_id,
                  'calorias' => 0,
                  'tiempo' => 0,
                  'velocidad_promedio' => 0,
                  'velocidad_maxima' => 0,
-                 'distancia_recorrida' => 0,
+                 'distancia_recorrida' => 100,
                  'temperatura' => 0,
              ]);
      
@@ -175,7 +176,7 @@ class RecorridoController extends Controller
             ], 404);
         }
 
-    }
+    }//no he probado si  funciona con mongoDB
 
     /**
      * Remove the specified resource from storage.
@@ -204,9 +205,11 @@ class RecorridoController extends Controller
                 'mensaje' => 'No se encontro el recorrido'
             ], 404);
         }
-    }
+    }//no he probado si  funciona con mongoDB
 
     // =======================================================================================
+
+    //=================== [ De aqui para abajo ya todo funciona con mongoDB @hugo]=============================
 
     public function recorridosUsuario()
     {
@@ -216,12 +219,12 @@ class RecorridoController extends Controller
             return response()->json(['message' => 'Usuario no autenticado'], 401);
         }
     
-        $recorridos = $usuario->recorridos()
-            ->with('bicicleta')
-            ->get()
+        $recorridos = $usuario->recorridos(function ($query) {
+            $query->with('bicicleta');
+            })
             ->map(function ($recorrido) {
                 return [
-                    'bicicleta_nombre' => $recorrido->bicicleta->nombre ?? 'Sin nombre',
+                    'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
                     'calorias' => $recorrido->calorias,
                     'tiempo' => $recorrido->tiempo,
                     'velocidad_promedio' => $recorrido->velocidad_promedio,
@@ -248,13 +251,13 @@ class RecorridoController extends Controller
         $hoy = Carbon::now()->endOfDay();
         $haceUnaSemana = Carbon::now()->subDays(7)->startOfDay();
     
-        $recorridos = $usuario->recorridos()
-            ->whereBetween('created_at', [$haceUnaSemana, $hoy])
-            ->with('bicicleta')
-            ->get()
+        $recorridos = $usuario->recorridos(function ($recorrido) use ($haceUnaSemana, $hoy) {
+            $recorrido->whereBetween('created_at', [$haceUnaSemana, $hoy])
+                ->bicicleta();
+            })
             ->map(function ($recorrido) {
                 return [
-                    'bicicleta_nombre' => $recorrido->bicicleta->nombre ?? 'Sin nombre',
+                    'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
                     'calorias' => $recorrido->calorias,
                     'tiempo' => $recorrido->tiempo,
                     'velocidad_promedio' => $recorrido->velocidad_promedio,
@@ -263,6 +266,7 @@ class RecorridoController extends Controller
                     'created_at' => $recorrido->created_at->toDateTimeString(),
                 ];
             });
+        
     
         return response()->json([
             'message' => 'Recorridos de la última semana obtenidos con éxito',
@@ -281,13 +285,13 @@ class RecorridoController extends Controller
         $hoy = Carbon::now()->endOfDay();
         $haceUnMes = Carbon::now()->subDays(30)->startOfDay();
     
-        $recorridos = $usuario->recorridos()
-            ->whereBetween('created_at', [$haceUnMes, $hoy])
-            ->with('bicicleta')
-            ->get()
+        $recorridos = $usuario->recorridos(function ($recorrido) use ($haceUnMes, $hoy) {
+            $recorrido->whereBetween('created_at', [$haceUnMes, $hoy])
+                ->bicicleta();
+            })
             ->map(function ($recorrido) {
                 return [
-                    'bicicleta_nombre' => $recorrido->bicicleta->nombre ?? 'Sin nombre',
+                    'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
                     'calorias' => $recorrido->calorias,
                     'tiempo' => $recorrido->tiempo,
                     'velocidad_promedio' => $recorrido->velocidad_promedio,

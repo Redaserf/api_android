@@ -32,6 +32,9 @@ Route::get('v1/admin/usuarios', [AdminController::class, 'todosLosUsuarios']);
 //usuario con sus bicicletas
 Route::get('v1/admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicleta'])->where('id', '[0-9]+');//
 
+//usuario con mas distancia recorrida
+Route::get('v1/admin/usuario/mayor/distancia', [AdminController::class, 'usuarioConMasKilometrosRecorridos'])
+->where('id', '[0-9]+');
 
 Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
 

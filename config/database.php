@@ -62,6 +62,18 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'host'     => env('MONGODB_HOST', '127.0.0.1'),
+            'port'     => env('MONGODB_PORT', 27017),
+            'database' => env('MONGODB_DATABASE', 'integradora2'),
+            'username' => env('MONGODB_USERNAME', ''),
+            'password' => env('MONGODB_PASSWORD', ''),
+            'options'  => [
+                'database' => env('MONGODB_AUTHENTICATION_DATABASE', 'admin'), // Base de datos para autenticar
+            ]
+        ],
 
         'pgsql' => [
             'driver' => 'pgsql',
