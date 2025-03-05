@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Recorrido;
+use Carbon\Carbon;
 use FuncInfo;
+use Hamcrest\Type\IsObject;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use MongoDB\BSON\UTCDateTime;
 
 class UsuarioController extends Controller
 {
@@ -97,6 +101,122 @@ class UsuarioController extends Controller
         ], 200);
     }
 
+
+
+    //estadisticas d ecada usuario
+
+    //consulta para traerse lo q viene siendo
+    //la siguiente consulta recibira una fecha y esa fecha tiene q ser siempre un lunes
+    //y a partir de esa fecha se hara la consulta para traerse los recorridos de esa semana
+    public function estadisticasDeLaSemana(Request $req)
+    {
+
+        $validaciones = Validator::make($req->all(), [
+            'fecha' => [
+                'required',
+                'date_format:Y-m-d',
+                function($attribute, $value, $fail) {
+                    // Verifica si la fecha es lunes
+                    if (!Carbon::parse($value)->isMonday()) {
+                        $fail('La fecha debe ser un lunes.');
+                    }
+                }
+            ]
+        ]);
+
+        if ($validaciones->fails()) {
+            return response()->json([
+                'message' => 'Errores en los datos enviados.',
+                'errors' => $validaciones->errors(),
+            ], 422);
+        }
+
+        $usuario = $req->user();
+        $fechaLunes = Carbon::parse($req->fecha);
+        $fechas = [
+            'lunes'   => new UTCDateTime($fechaLunes->copy()->startOfDay()->timestamp * 1000),//esto da error pero funciona cuando descargas correctamente el pcel de mongodb
+            'martes'    => $fechaLunes->copy()->addDay()->startOfDay()->toIso8601String(),
+            'miercoles' => $fechaLunes->copy()->addDays(2)->startOfDay()->toIso8601String(),
+            'jueves'    => $fechaLunes->copy()->addDays(3)->startOfDay()->toIso8601String(),
+            'viernes'   => $fechaLunes->copy()->addDays(4)->startOfDay()->toIso8601String(),
+            'sabado'    => $fechaLunes->copy()->addDays(5)->startOfDay()->toIso8601String(),
+            'domingo'   => new UTCDateTime($fechaLunes->copy()->addDays(6)->endOfDay()->timestamp * 1000),//esto da error pero funciona cuando descargas correctamente el pcel de mongodb
+        ];
+
+
+        $recorridos = Recorrido::raw(function($collection) use ($usuario, $fechas) {
+            return $collection->aggregate([
+                [
+                    '$match' => [
+                        'usuario._id' => $usuario->id,
+                        'acabado' => false,//cambiar a true para q solo traiga los recorridos acabados
+                        'created_at' => [
+                            '$gte' => $fechas['lunes'],
+                            '$lte' => $fechas['domingo'],
+                        ],
+                    ],//aqui falta ponerle q este acabado
+                ],
+                [
+                   '$group' => [
+                        '_id' => [
+                            '$dateToString' => [
+                                'format' => "%Y-%m-%d",
+                                'date' => '$created_at'
+                            ]
+                        ],//agrupa por dias
+                        'distancia_recorrida' => ['$sum' => '$distancia_recorrida'], //distancia recorrida por dia
+                        'calorias' => ['$sum' => '$calorias'], //calorias quemadas por dia
+                        'duracion_final' => ['$sum' => '$duracion_final'], //duracion total por dia
+                   ]
+                ],
+                [
+                    '$addFields' => [
+                      'diaSemana' => [ '$isoDayOfWeek' => [ '$toDate' => '$_id' ] ]
+                    ]
+                ],
+                [
+                    '$sort' => [
+                        'diaSemana' => 1
+                    ]
+                ],//ordena de lunes a domingo ej: lunes = 1, martes = 2, miercoles = 3, jueves = 4, viernes = 5, sabado = 6, domingo = 7
+            ]);
+        });//recorridos ya viene por dia, Lunes, Martes, Miercoles, Jueves, Viernes, Sabado, Domingo o sea q trae 7 documentos y trae la distancia, calorias, duracion por dia
+
+        // dd($recorridos);
+
+        $estadisticasGenerales = [
+            'distancia' => [
+                'total' => $recorridos->sum('distancia_recorrida'),
+                'promedio' => $recorridos->avg('distancia_recorrida') ?? 0,
+                'maxima' => $recorridos->max('distancia_recorrida') ?? 0,
+                'minima' => $recorridos->min('distancia_recorrida') ?? 0,
+            ],
+            'calorias' => [
+                'total' => $recorridos->sum('calorias'),
+                'promedio' => $recorridos->avg('calorias') ?? 0,
+                'maxima' => $recorridos->max('calorias') ?? 0,
+                'minima' => $recorridos->min('calorias') ?? 0,
+            ],
+            'duracion' => [
+                'total' => $recorridos->sum('duracion_final'),
+                'promedio' => $recorridos->avg('duracion_final') ?? 0,
+                'maxima' => $recorridos->max('duracion_final') ?? 0,
+                'minima' => $recorridos->min('duracion_final') ?? 0,
+            ],
+        ];
+
+        // dd($estadisticasGenerales);
+
+       
+        return response()->json([
+            'message' => 'Estadísticas de la semana.',
+            'data' => [
+                'generales' => $estadisticasGenerales,
+                'porDiaSemana' => $recorridos,
+            ],
+        ], 200);
+
+    }
 
     
     

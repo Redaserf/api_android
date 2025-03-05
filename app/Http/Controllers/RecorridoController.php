@@ -65,12 +65,14 @@ class RecorridoController extends Controller
              $recorrido = Recorrido::create([
                  'usuario' => ['_id' => $usuario_id, 'rol_id' => Auth::user()->rol_id],
                  'bicicleta_id' => $request->bicicleta_id,
-                 'calorias' => 0,
+                 'calorias' => rand(1, 100),
                  'tiempo' => 0,
                  'velocidad_promedio' => 0,
                  'velocidad_maxima' => 0,
-                 'distancia_recorrida' => 100,
+                 'distancia_recorrida' => rand(1, 100),
                  'temperatura' => 0,
+                 'duracion_final' => rand(1, 100),
+                 'acabado' => false
              ]);
      
              return response()->json([
@@ -122,7 +124,7 @@ class RecorridoController extends Controller
      * @param  \App\Models\Recorrido  $recorrido
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id)//falta meterle lo de distancia_final q no es requerida
     {
         //
         $validaciones = Validator::make($request->all(), [
@@ -131,6 +133,7 @@ class RecorridoController extends Controller
             'velocidad_promedio' => 'numeric',
             'velocidad_maxima' => 'numeric',
             'distancia_recorrida' => 'numeric',
+            'duracion_final' => 'numeric',
             
         ], [
             'calorias.numeric' => 'El campo calorias debe ser de tipo double',
@@ -143,7 +146,7 @@ class RecorridoController extends Controller
 
             'distancia_recorrida' => 'La distancia recorrida debe ser de tipo double',
             
-
+            'duracion_final' => 'La duracion final debe ser de tipo double',
         ]);
 
         if($validaciones->fails()){
@@ -161,6 +164,7 @@ class RecorridoController extends Controller
             $recorrido->velocidad_promedio = $request->velocidad_promedio ?? $recorrido->velocidad_promedio;
             $recorrido->velocidad_maxima = $request->velocidad_maxima ?? $recorrido->velocidad_maxima;
             $recorrido->distancia_recorrida = $request->distancia_recorrida ?? $recorrido->distancia_recorrida;
+            $recorrido->duracion_final = $request->duracion_final ?? $recorrido->duracion_final;
     
             $recorrido->save();
 

@@ -17,9 +17,18 @@ class Recorrido extends Eloquent
     
     protected $table = 'recorridos';
     protected $fillable =
-    ['calorias', 'tiempo', 'velocidad_promedio',
-     'velocidad_maxima', 'distancia_recorrida',
-     'usuario', 'bicicleta_id', 'temperatura'];
+    [
+    'calorias',
+     'tiempo',
+     'velocidad_promedio',
+     'velocidad_maxima',
+      'distancia_recorrida',
+     'usuario', 
+     'bicicleta_id',
+      'temperatura',
+      'duracion_final', //en este campo se va a estar metiendo el valor del cronometro q se inicia en la aplicacion cada q se termina un recorrido 
+      'acabado', //true => el recorrido ya termino, false => el recorrido sigue en curso 
+    ];
 
     public function usuario(){
         return $this->belongsTo(Usuario::class, 'usuario_id');

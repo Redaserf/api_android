@@ -82,6 +82,10 @@ Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', 
 
             Route::post('encender/luz', [ArduinoController::class, 'encenderMatriz']);
 
+
+            // ===[ Estadisticas Usuario ]===
+            Route::post('estadisticas', [UsuarioController::class, 'estadisticasDeLaSemana']);
+
             Route::middleware(['auth.admin'])->group(function () {
 
                 //todos los usuarios

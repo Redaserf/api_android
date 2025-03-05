@@ -30,7 +30,7 @@ class AdafruitController extends Controller
         Log::info("Peso del usuario: {$pesoUsuario}");
 
         try {
-            // =====[ Obtener datos de Adafruit ]=====
+            // =====[ Obtener datos de Adafruit ]===== //esto se va a cambiar a que los traiga de Recorrido(mongodb) y se este actualizando con los datos q manden los sensores
             $response = Http::withHeaders([
                 'X-AIO-Key' => $apiKey,
             ])->get($url);

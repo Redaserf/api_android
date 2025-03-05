@@ -14,6 +14,6 @@ class Velocidad extends Model
 
     public function recorrido()
     {
-        return $this->belongsTo(Recorrido::class, 'recorrido_id');
+        return Recorrido::where('_id', $this->recorrido_id)->first();
     }
 }

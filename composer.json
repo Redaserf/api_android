@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "league/flysystem-aws-s3-v3": "^3.29",
+        "mongodb/mongodb": "^1.20",
         "php-open-source-saver/jwt-auth": "^2.2"
     },
     "require-dev": {
