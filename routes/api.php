@@ -32,6 +32,21 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 Route::get('v1/admin/usuario/mayor/distancia', [AdminController::class, 'usuarioConMasKilometrosRecorridos'])
 ->where('id', '[0-9]+');
 
+//recorrido con mas distancia
+Route::get('v1/admin/recorrido/mayor/distancia', [AdminController::class, 'recorridoConMasDistancia']);
+
+//todos los usuarios
+Route::get('v1/admin/usuarios', [AdminController::class, 'todosLosUsuarios']);
+
+//usuario con sus bicicletas
+Route::get('v1/admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicletas']);
+
+//recorridos terminados por semana //esta es para la grafica de admin line chart
+Route::get('v1/admin/recorridos/semana', [AdminController::class, 'recorridosTerminadosPorSemana']);
+
+//distancia recorrida por cada usuario
+Route::get('v1/admin/distancia/usuario', [AdminController::class, 'distanciaPorUsuario']);
+
 Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
 
     Route::prefix("v1/")->group(function(){

@@ -26,8 +26,8 @@ class Recorrido extends Eloquent
      'usuario', 
      'bicicleta_id',
       'temperatura',
-      'duracion_final', //en este campo se va a estar metiendo el valor del cronometro q se inicia en la aplicacion cada q se termina un recorrido 
-      'acabado', //true => el recorrido ya termino, false => el recorrido sigue en curso 
+      'duracion_final', //este campo se va a convertir a segundos el tiempo al acabar el recorrido
+      'acabado', //true => el recorrido ya termino, false => el recorrido aun no termina 
     ];
 
     public function usuario(){

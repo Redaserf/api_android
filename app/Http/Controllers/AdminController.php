@@ -20,7 +20,7 @@ class AdminController extends Controller
     }
 
 
-    public function showUsuarioConBicicleta($id){
+    public function showUsuarioConBicicletas($id){
 
         $usuario = Usuario::findOrFail($id);
         if($usuario){
@@ -71,4 +71,105 @@ class AdminController extends Controller
         return response()->json($recorridoConMasDistancia);
     }
 
+
+
+    //segunda grafica de admin //es la que muestra el mes y el dia de donde acaba la semana
+    public function recorridosTerminadosPorSemana(){
+        $recorridos = Recorrido::raw(function($collection){
+            return $collection->aggregate([
+                [
+                    '$match' => [
+                        'acabado' => false
+                    ]//Cambiar a true para que solo traiga los recorridos acabados
+                ],
+                [
+                    '$group' => [
+                        '_id' => [
+                            'isoAnio' => [
+                                '$isoWeekYear' => '$created_at'
+                            ],
+                            'isoSemana' =>
+                            [
+                                '$isoWeek' => '$created_at'
+                            ]
+                        ],
+                        'total' => ['$sum' => 1]
+                    ]
+                ],
+                [
+                    '$sort' => ['_id' => 1]
+                ],
+                [
+                    '$addFields' => [
+                        'primerDiaSemana' => [
+                            '$dateFromParts' => [
+                                'isoWeekYear' => '$_id.isoAnio',
+                                'isoWeek' => '$_id.isoSemana',
+                                'isoDayOfWeek' => 1
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    '$addFields' => [
+                        'mesDeLaSemana' => [
+                            '$month' => '$primerDiaSemana'
+                        ],
+                        'diaDelMes' => [
+                            '$dayOfMonth' => '$primerDiaSemana'
+                        ]
+                    ]
+                ],
+                [
+                    '$sort' => ['_id.isoSemana' => 1]
+                ]
+            ]);
+        });
+
+        // dd($recorridos);
+        return response()->json($recorridos);
+    }
+    
+
+    public function distanciaPorUsuario(){
+        $distanciaPorUsuario = Recorrido::raw(function($collection){
+            return $collection->aggregate([
+                [
+                    '$match' => [
+                        'usuario.rol_id' => 2,//usuarios con rol usuario
+                        'acabado' => false //Cambiar a true
+                    ]
+                ],
+                [
+                    '$group' => [
+                        '_id' => '$usuario._id',
+                        'total' => ['$sum' => '$distancia_recorrida']
+                    ]
+                ],
+                [
+                    '$sort' => ['total' => -1]
+                ]
+            ]);
+        });
+
+        return response()->json($distanciaPorUsuario);
+    }
+
+    public function porcentajeRecorridosPorBici(){
+        $recorridosPorBici = Recorrido::raw(function($collection){
+            return $collection->aggregate([
+                [
+                    '$group' => [
+                        '_id' => '$bicicleta_id',
+                        'total' => ['$sum' => 1]
+                    ]
+                ],
+                [
+                    '$sort' => ['total' => -1]
+                ]
+            ]);
+        });
+
+        return response()->json($recorridosPorBici);
+    }
 }

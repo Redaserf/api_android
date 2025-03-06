@@ -133,28 +133,21 @@ class UsuarioController extends Controller
 
         $usuario = $req->user();
         $fechaLunes = Carbon::parse($req->fecha);
-        $fechas = [
-            'lunes'   => new UTCDateTime($fechaLunes->copy()->startOfDay()->timestamp * 1000),//esto da error pero funciona cuando descargas correctamente el pcel de mongodb
-            'martes'    => $fechaLunes->copy()->addDay()->startOfDay()->toIso8601String(),
-            'miercoles' => $fechaLunes->copy()->addDays(2)->startOfDay()->toIso8601String(),
-            'jueves'    => $fechaLunes->copy()->addDays(3)->startOfDay()->toIso8601String(),
-            'viernes'   => $fechaLunes->copy()->addDays(4)->startOfDay()->toIso8601String(),
-            'sabado'    => $fechaLunes->copy()->addDays(5)->startOfDay()->toIso8601String(),
-            'domingo'   => new UTCDateTime($fechaLunes->copy()->addDays(6)->endOfDay()->timestamp * 1000),//esto da error pero funciona cuando descargas correctamente el pcel de mongodb
-        ];
+        $lunes = new UTcDateTime($fechaLunes->copy()->startOfDay()->timestamp * 1000);//esto da error pero si tienes descargado correctamente el pcel de mongo no deberia dar error
+        $domingo = new UTcDateTime($fechaLunes->copy()->addDays(6)->endOfDay()->timestamp * 1000);
 
 
-        $recorridos = Recorrido::raw(function($collection) use ($usuario, $fechas) {
+        $recorridos = Recorrido::raw(function($collection) use ($usuario, $lunes, $domingo) {
             return $collection->aggregate([
                 [
                     '$match' => [
                         'usuario._id' => $usuario->id,
                         'acabado' => false,//cambiar a true para q solo traiga los recorridos acabados
                         'created_at' => [
-                            '$gte' => $fechas['lunes'],
-                            '$lte' => $fechas['domingo'],
+                            '$gte' => $lunes,
+                            '$lte' => $domingo,
                         ],
-                    ],//aqui falta ponerle q este acabado
+                    ],
                 ],
                 [
                    '$group' => [
@@ -166,7 +159,14 @@ class UsuarioController extends Controller
                         ],//agrupa por dias
                         'distancia_recorrida' => ['$sum' => '$distancia_recorrida'], //distancia recorrida por dia
                         'calorias' => ['$sum' => '$calorias'], //calorias quemadas por dia
-                        'duracion_final' => ['$sum' => '$duracion_final'], //duracion total por dia
+                        'duracion_final' => [
+                            '$sum' =>[
+                                '$divide' => [
+                                    '$duracion_final',
+                                    60
+                                ]
+                            ]
+                        ], //duracion total por dia en minutos
                    ]
                 ],
                 [
@@ -210,13 +210,13 @@ class UsuarioController extends Controller
        
         return response()->json([
             'message' => 'Estadísticas de la semana.',
-            'data' => [
-                'generales' => $estadisticasGenerales,
-                'porDiaSemana' => $recorridos,
-            ],
+            'generales' => $estadisticasGenerales,
+            'porDiaSemana' => $recorridos,
         ], 200);
 
     }
+
+    
 
     
     
