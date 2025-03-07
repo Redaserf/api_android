@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Recorrido;
 use App\Models\Usuario;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -69,67 +70,7 @@ class AdminController extends Controller
         $recorridoConMasDistancia = Recorrido::orderBy('distancia_recorrida', 'desc')->first();
 
         return response()->json($recorridoConMasDistancia);
-    }
-
-
-
-    //segunda grafica de admin //es la que muestra el mes y el dia de donde acaba la semana
-    public function recorridosTerminadosPorSemana(){
-        $recorridos = Recorrido::raw(function($collection){
-            return $collection->aggregate([
-                [
-                    '$match' => [
-                        'acabado' => false
-                    ]//Cambiar a true para que solo traiga los recorridos acabados
-                ],
-                [
-                    '$group' => [
-                        '_id' => [
-                            'isoAnio' => [
-                                '$isoWeekYear' => '$created_at'
-                            ],
-                            'isoSemana' =>
-                            [
-                                '$isoWeek' => '$created_at'
-                            ]
-                        ],
-                        'total' => ['$sum' => 1]
-                    ]
-                ],
-                [
-                    '$sort' => ['_id' => 1]
-                ],
-                [
-                    '$addFields' => [
-                        'primerDiaSemana' => [
-                            '$dateFromParts' => [
-                                'isoWeekYear' => '$_id.isoAnio',
-                                'isoWeek' => '$_id.isoSemana',
-                                'isoDayOfWeek' => 1
-                            ]
-                        ]
-                    ]
-                ],
-                [
-                    '$addFields' => [
-                        'mesDeLaSemana' => [
-                            '$month' => '$primerDiaSemana'
-                        ],
-                        'diaDelMes' => [
-                            '$dayOfMonth' => '$primerDiaSemana'
-                        ]
-                    ]
-                ],
-                [
-                    '$sort' => ['_id.isoSemana' => 1]
-                ]
-            ]);
-        });
-
-        // dd($recorridos);
-        return response()->json($recorridos);
-    }
-    
+    }    
 
     public function distanciaPorUsuario(){
         $distanciaPorUsuario = Recorrido::raw(function($collection){
@@ -171,5 +112,71 @@ class AdminController extends Controller
         });
 
         return response()->json($recorridosPorBici);
+    }
+
+
+    //=================== CONSULTA PARA GRAFICA DE EL ADMIN ===================
+    //esta consulta se trae la cantidad de recorridos hechos por semana en el año actual
+
+    //es la que muestra el mes y el dia de inicia cada la semana
+    public function recorridosTerminadosPorSemana(){
+        $recorridos = Recorrido::raw(function($collection){
+            return $collection->aggregate([
+                [
+                    '$match' => [
+                        'acabado' => false
+                    ]//Cambiar a true para que solo traiga los recorridos acabados
+                ],
+                [
+                    '$group' => [
+                        '_id' => [
+                            '$isoWeek' => '$created_at'
+                        ],
+                        'total' => ['$sum' => 1]
+                        ],
+                ],
+                [
+                    '$sort' => ['_id' => 1]
+                ],
+            ]);
+        });
+        // dd($recorridos);
+
+        $isoAnio = Carbon::now()->isoWeekYear;//el año en formato iso(2025)
+        $data = [];
+        foreach($recorridos as $recorrido){
+        //de cada semana ocupo sacar el mes y el dia en el q se hizo
+            
+            $fechaDeLaSemana = Carbon::now()->setISODate($isoAnio, $recorrido->_id);//fecha de cada semana en el año
+            $data[] = [
+                'mes' => $fechaDeLaSemana->month,
+                'dia' => $fechaDeLaSemana->day,
+                'cantidadRecorridos' => $recorrido->total
+            ];
+        }//saco la fecha de cada semana en el año
+
+        $meses = [
+            0 => 'Enero',
+            1 => 'Febrero',
+            2 => 'Marzo',
+            3 => 'Abril',
+            4 => 'Mayo',
+            5 => 'Junio',
+            6 => 'Julio',
+            7 => 'Agosto',
+            8 => 'Septiembre',
+            9 => 'Octubre',
+            10 => 'Noviembre',
+            11 => 'Diciembre'
+        ];
+
+        for($i = 0; $i < count($data); $i++){
+            $data[$i]['mes'] = $meses[$data[$i]['mes'] - 1];//cambio el iso del mes por el nombre del mes
+        }
+        // dd($data);
+        // dd($isoYear);
+
+        // dd($recorridos);
+        return response()->json($data);
     }
 }

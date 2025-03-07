@@ -107,7 +107,9 @@ class UsuarioController extends Controller
 
     //consulta para traerse lo q viene siendo
     //la siguiente consulta recibira una fecha y esa fecha tiene q ser siempre un lunes
-    //y a partir de esa fecha se hara la consulta para traerse los recorridos de esa semana
+    //y a partir de esa fecha se hara la consulta para traerse los recorridos de ese lunes hasta el domingo de esa semana
+
+    //esto hay q adapatarlo en ios para q solo mande la fecha del lunes de la semana en la q esta
     public function estadisticasDeLaSemana(Request $req)
     {
 
@@ -163,7 +165,7 @@ class UsuarioController extends Controller
                             '$sum' =>[
                                 '$divide' => [
                                     '$duracion_final',
-                                    60
+                                    60//duracion por minutos
                                 ]
                             ]
                         ], //duracion total por dia en minutos
@@ -217,7 +219,47 @@ class UsuarioController extends Controller
     }
 
     
-
+    //=================== Resumen de cada usuario TOTAL () ==================
     
+    public function resumenTotal(Request $req)
+    {
+        $usuario = $req->user();
+    
+        $recorridos = Recorrido::raw(function($collection) use ($usuario) {
+            return $collection->aggregate([
+                [
+                    '$match' => [
+                        'usuario._id' => $usuario->id,
+                        'acabado' => false,//cambiar a true para q solo traiga los recorridos acabados
+                    ],
+                ],
+                [
+                    '$group' => [
+                        '_id' => null,
+                        'distancia_recorrida' => ['$sum' => '$distancia_recorrida'],
+                        'calorias' => ['$sum' => '$calorias'],
+                        'duracion_final' => [
+                            '$sum' => [
+                                '$divide' => [
+                                    '$duracion_final',
+                                    60//duracion en minutos
+                                ]
+                            ]
+                        ],
+                    ]
+                ],
+            ]);
+        });
+    
+        $recorridos = $recorridos->first();
+    
+        return response()->json([
+            'msg' => 'Resumen total de recorridos.',
+            'distancia' => $recorridos->distancia_recorrida ?? 0,
+            'calorias' => $recorridos->calorias ?? 0,
+            'duracion' => $recorridos->duracion_final ?? 0,
+        ], 200);
+    }
+
     
 }
