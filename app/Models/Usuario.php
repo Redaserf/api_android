@@ -24,6 +24,7 @@ class Usuario extends Authenticatable
         'nombre',
         'apellido',
         'peso',
+        'estatura',
         'codigo',
         'email',
         'password',
