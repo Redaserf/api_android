@@ -42,23 +42,9 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 
 // Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
 
-//todos los usuarios
-Route::get('v1/admin/usuarios', [AdminController::class, 'todosLosUsuarios']);
 
 //usuario con sus bicicletas
-Route::get('v1/admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicletas']);
-
-//======================== ESTADISTICAS ========================
-            //=========== Admin ===========
-//recorridos terminados por semana //esta es para la grafica de admin line chart
-Route::get('v1/admin/recorridos/semana', [AdminController::class, 'recorridosTerminadosPorSemana']);
-
-            // ===[ Estadisticas Usuario ]===
-Route::post('estadisticas', [UsuarioController::class, 'estadisticasDeLaSemana']);
-//resumen total de calorias, distancia y tiempo recorrido por usuario
-Route::get('v1/admin/resumen/usuario', [UsuarioController::class, 'resumenTotal']);
-
-
+// Route::get('v1/admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicletas']);
 
     Route::prefix("v1/")->group(function(){
 
@@ -108,14 +94,26 @@ Route::get('v1/admin/resumen/usuario', [UsuarioController::class, 'resumenTotal'
 
             Route::post('encender/luz', [ArduinoController::class, 'encenderMatriz']);
 
+            // =======================[ Estadisticas Usuario ]=============================
+            // estadisticas del usuario logeado
+            Route::post('semana/estadisticas', [UsuarioController::class, 'estadisticasDeLaSemana']);
+
+            //resumen total de calorias, distancia y tiempo recorrido del usuario logeado
+            Route::get('resumen/usuario', [UsuarioController::class, 'resumenTotal']);
 
             Route::middleware(['auth.admin'])->group(function () {
 
                 //todos los usuarios
-                Route::get('v1/admin/usuarios', [AdminController::class, 'todosLosUsuarios']);
+                Route::get('admin/usuarios', [AdminController::class, 'todosLosUsuarios']);
+
 
                 //usuario con sus bicicletas
-                Route::get('v1/admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicleta'])->where('id', '[0-9]+');//
+                Route::get('admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicleta'])->where('id', '[0-9]+');//
+
+                //======================== ESTADISTICAS ========================
+                            //=========== Admin ===========
+                //recorridos terminados por semana //esta es para la grafica de admin line chart
+                Route::get('admin/recorridos/semana', [AdminController::class, 'recorridosTerminadosPorSemana']);
 
             });
 

@@ -113,28 +113,8 @@ class UsuarioController extends Controller
     public function estadisticasDeLaSemana(Request $req)
     {
 
-        $validaciones = Validator::make($req->all(), [
-            'fecha' => [
-                'required',
-                'date_format:Y-m-d',
-                function($attribute, $value, $fail) {
-                    // Verifica si la fecha es lunes
-                    if (!Carbon::parse($value)->isMonday()) {
-                        $fail('La fecha debe ser un lunes.');
-                    }
-                }
-            ]
-        ]);
-
-        if ($validaciones->fails()) {
-            return response()->json([
-                'message' => 'Errores en los datos enviados.',
-                'errors' => $validaciones->errors(),
-            ], 422);
-        }
-
         $usuario = $req->user();
-        $fechaLunes = Carbon::parse($req->fecha);
+        $fechaLunes = Carbon::now()->startOfWeek(Carbon::MONDAY);//esto da la fecha del lunes de la semana actual
         $lunes = new UTcDateTime($fechaLunes->copy()->startOfDay()->timestamp * 1000);//esto da error pero si tienes descargado correctamente el pcel de mongo no deberia dar error
         $domingo = new UTcDateTime($fechaLunes->copy()->addDays(6)->endOfDay()->timestamp * 1000);
 
@@ -230,7 +210,7 @@ class UsuarioController extends Controller
                 [
                     '$match' => [
                         'usuario._id' => $usuario->id,
-                        'acabado' => false,//cambiar a true para q solo traiga los recorridos acabados
+                        'acabado' => true,//cambiar a true para q solo traiga los recorridos acabados
                     ],
                 ],
                 [
