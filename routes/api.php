@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArduinoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BicicletaController;
+use App\Http\Controllers\PruebaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecorridoController;
@@ -51,7 +52,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
         // ===[ Users ]===
         Route::post('register', [AuthController::class,'register']);
         Route::post('login', [AuthController::class,'login']);
-        
+
         // ===[ Activar cuenta y reenviar email ]===
         Route::post('reenviar', [AuthController::class,'reenviar']);
         Route::post('verify-code', [AuthController::class, 'verificarCodigo']);
@@ -69,14 +70,14 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 
             // ===[ Adafruit ]===
             Route::post('adafruit', [AdafruitController::class, 'obtenerDatos']);
-            
+
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
             Route::post('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
             Route::get('imagen/{id}', [BicicletaController::class, 'imagen']);
             Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis
             Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
-        
+
             // ===[ Recorridos ]===
             Route::post('recorrido', [RecorridoController::class, 'store']); // Crear
             Route::put('recorrido/{id}', [RecorridoController::class, 'update'])->where('id', '[0-9]+'); // Editar
@@ -86,7 +87,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
             Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy'])->where('id', '[0-9]+'); // Eliminar un recorrido
             Route::get('recorridos/semana', [RecorridoController::class, 'recorridosPorSemana']);
             Route::get('recorridos/mes', [RecorridoController::class, 'recorridosPorMes']);
-            
+
             // ===[ Velocidades ]===
             Route::post('velocidades', [VelocidadController::class, 'eliminarVelocidades']);
 
@@ -127,8 +128,8 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
         });
 
     });
-    
 
+    Route::get('v1/prueba/conexion',[PruebaController::class,'pruebaDeConexion']);
     // == [ Re-envio de contra - DLC] ==
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');
     Route::post('v1/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');

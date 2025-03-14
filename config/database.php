@@ -62,7 +62,7 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        
+
         'mongodb' => [
             'driver'   => 'mongodb',
             'host'     => env('MONGODB_HOST', '127.0.0.1'),
