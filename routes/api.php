@@ -54,7 +54,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
         
         // ===[ Activar cuenta y reenviar email ]===
         Route::post('reenviar', [AuthController::class,'reenviar']);
-        Route::post('send', [AuthController::class, 'verificarCodigo']);
+        Route::post('verify-code', [AuthController::class, 'verificarCodigo']);
         // Route::get('activate/{id}',[AuthController::class,'activate'])->name('activation.verify');
 
         // ===[ Middleware |Tiene que estar logueado| ]===
