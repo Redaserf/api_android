@@ -43,8 +43,6 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 // Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
 
 
-//usuario con sus bicicletas
-// Route::get('v1/admin/show/usuario/{id}', [AdminController::class, 'showUsuarioConBicicletas']);
 
     Route::prefix("v1/")->group(function(){
 
@@ -115,6 +113,15 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
                 //recorridos terminados por semana //esta es para la grafica de admin line chart
                 Route::get('admin/recorridos/semana', [AdminController::class, 'recorridosTerminadosPorSemana']);
 
+                //Crud usuarios
+
+                Route::delete('usuario/{id}', [AdminController::class, 'eliminarUsuario'])->where('id', '[0-9]+');
+                Route::put('usuario/{id}', [AdminController::class, 'editarUsuario'])->where('id', '[0-9]+');
+                Route::get('usuario/{id}', [AdminController::class, 'usuario'])->where('id', '[0-9]+');
+
+
+                //bicicletas con usuario
+                Route::get('admin/bicicletas', [AdminController::class, 'bicicletasConUsuario']);
             });
 
         });

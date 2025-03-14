@@ -2,16 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bicicleta;
 use App\Models\Recorrido;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
     //
     
+    public function eliminarUsuario($id){
+        $usuario = Usuario::findOrFail($id);
+        $usuario->delete();
+
+        return response()->json([
+            'message' => 'Usuario eliminado correctamente'
+        ]);
+    }
+
+    public function editarUsuario(Request $req, $id){
+        
+        $validaciones = Validator::make($req->all(), [
+            'nombre' => 'string',
+            'apellido' => 'string',
+            'email' => 'email|unique:usuarios,email',
+            'peso' => 'numeric|between:20,150',
+            'estatura' => 'numeric|between:1.10,2.20',
+        ], [
+            'nombre.string' => 'El nombre debe ser una cadena de texto',
+            
+            'apellido.string' => 'El apellido debe ser una cadena de texto',
+            
+            'email.email' => 'El email debe ser un email valido',
+            'email.unique' => 'El email ya esta en uso',
+
+            'peso.numeric' => 'El peso debe ser un número.',
+            'peso.between' => 'El peso debe estar entre 20kg y 150kg.',
+            
+            'estatura.numeric' => 'La estatura debe ser un número.',
+            'estatura.between' => 'La estatura debe estar entre 1.10m y 2.20m.',
+        ]);
+
+
+        if($validaciones->fails()){
+            return response()->json([
+                'message' => 'Datos incorrectos',
+                'errors' => $validaciones->errors()
+            ], 422);
+        }
+
+
+        $usuario = Usuario::findOrFail($id);
+        $usuario->nombre = $req->nombre ?? $usuario->nombre;
+        $usuario->apellido = $req->apellido ?? $usuario->apellido;
+        $usuario->email = $req->email ?? $usuario->email;
+        $usuario->peso = $req->peso ?? $usuario->peso;
+        $usuario->estatura = $req->estatura ?? $usuario->estatura;
+        $usuario->save();
+
+        return response()->json([
+            'message' => 'Usuario actualizado correctamente',
+            'usuario' => $usuario
+        ]);
+    }
+
+    public function usuario($id){
+        $usuario = Usuario::findOrFail($id);
+
+        return response()->json($usuario);
+    }
 
     public function todosLosUsuarios()
     {
@@ -21,14 +83,11 @@ class AdminController extends Controller
     }
 
 
-    public function showUsuarioConBicicletas($id){
+    public function bicicletasConUsuario(){
 
-        $usuario = Usuario::findOrFail($id);
-        if($usuario){
-            $usuario->load('bicicletas');
-        }
+        $bicicletas = Bicicleta::with('usuario')->get();
 
-        return response()->json($usuario, 200);
+        return response()->json($bicicletas, 200);
     }
     
     //consultas para graficas y demas estadisticas en vista de admin
