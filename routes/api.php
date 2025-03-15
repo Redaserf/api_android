@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArduinoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BicicletaController;
+use App\Http\Controllers\CalculosController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecorridoController;
@@ -27,7 +28,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 });
 
 
-
+// ================= [IGNORAR RUTAS COMENTADAS]==================
 
 //usuario con mas distancia recorrida
 // Route::get('v1/admin/usuario/mayor/distancia', [AdminController::class, 'usuarioConMasKilometrosRecorridos'])
@@ -89,15 +90,18 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
             
             // ===[ Velocidades ]===
             Route::post('velocidades', [VelocidadController::class, 'eliminarVelocidades']);
-
+            
             Route::post('encender/luz', [ArduinoController::class, 'encenderMatriz']);
-
+            
             // =======================[ Estadisticas Usuario ]=============================
             // estadisticas del usuario logeado
             Route::post('semana/estadisticas', [UsuarioController::class, 'estadisticasDeLaSemana']);
-
+            
             //resumen total de calorias, distancia y tiempo recorrido del usuario logeado
             Route::get('resumen/usuario', [UsuarioController::class, 'resumenTotal']);
+            
+            // =======================[ Obtener datos de recorrido actual ]=============================
+            Route::post('datos', [CalculosController::class, 'obtenerDatos']);
 
             Route::middleware(['auth.admin'])->group(function () {
 
@@ -128,7 +132,10 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 
     });
     
+    // =======================[ Recibir datos de la raspberry ]=============================
+    Route::post('v1/sensores', [CalculosController::class, 'calcularDatosGuardarRecorridoEnMongo']);
 
     // == [ Re-envio de contra - DLC] ==
+
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');
     Route::post('v1/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');

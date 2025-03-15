@@ -20,12 +20,19 @@ class Recorrido extends Eloquent
     [
     'calorias',
      'tiempo',
+     'velocidad',//velocidad actual (sera la q se muestra en la aplicacion)
      'velocidad_promedio',
      'velocidad_maxima',
       'distancia_recorrida',
-     'usuario', 
+     'usuario',
      'bicicleta_id',
-      'temperatura',
+     'temperatura',
+     'suma_velocidad',//este campo sera un arreglo q tendra la suma de las velocidades de cada recorrido y la cantidad de velocidades calculadas para sacar el promedio
+     //[
+     //  'suma' => 0,
+     //  'cantidad' => 0
+     //]
+    //  'peso_perdido' => 0,
       'duracion_final', //este campo se va a convertir a segundos el tiempo al acabar el recorrido
       'acabado', //true => el recorrido ya termino, false => el recorrido aun no termina 
     ];

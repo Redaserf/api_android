@@ -67,8 +67,10 @@ class RecorridoController extends Controller
                  'bicicleta_id' => $request->bicicleta_id,
                  'calorias' => rand(1, 100),
                  'tiempo' => 0,
+                 'velocidad' => 0,
                  'velocidad_promedio' => 0,
                  'velocidad_maxima' => 0,
+                 'suma_velocidad' => ['suma' => 0, 'cantidad' => 0],
                  'distancia_recorrida' => rand(1, 100),
                  'temperatura' => 0,
                  'duracion_final' => rand(1, 100),
@@ -130,23 +132,28 @@ class RecorridoController extends Controller
         $validaciones = Validator::make($request->all(), [
             'calorias' => 'numeric',
             'tiempo' => 'date_format:H:i:s',
+            'velocidad' => 'numeric',
             'velocidad_promedio' => 'numeric',
             'velocidad_maxima' => 'numeric',
+            'suma_velocidad' => 'array',
             'distancia_recorrida' => 'numeric',
             'duracion_final' => 'numeric',
+            'acabado' => 'boolean'
             
         ], [
             'calorias.numeric' => 'El campo calorias debe ser de tipo double',
 
             'tiempo.date_format' => 'El campo tiempo debe ser con el formato HH::MM::SS',
 
-            'velocidad_promedio' => 'La velocidad promedio debe ser de tipo double',
+            'velocidad_promedio.numeric' => 'La velocidad promedio debe ser de tipo double',
             
-            'velocidad_maxima' => 'La velocidad maxima debe ser de tipo double',
+            'velocidad_maxima.numeric' => 'La velocidad maxima debe ser de tipo double',
 
-            'distancia_recorrida' => 'La distancia recorrida debe ser de tipo double',
+            'distancia_recorrida.numeric' => 'La distancia recorrida debe ser de tipo double',
             
-            'duracion_final' => 'La duracion final debe ser de tipo double',
+            'duracion_final.numeric' => 'La duracion final debe ser de tipo double',
+
+            'acabado.boolean' => 'El campo acabado debe ser de tipo boolean'
         ]);
 
         if($validaciones->fails()){
@@ -165,6 +172,7 @@ class RecorridoController extends Controller
             $recorrido->velocidad_maxima = $request->velocidad_maxima ?? $recorrido->velocidad_maxima;
             $recorrido->distancia_recorrida = $request->distancia_recorrida ?? $recorrido->distancia_recorrida;
             $recorrido->duracion_final = $request->duracion_final ?? $recorrido->duracion_final;
+            $recorrido->acabado = $request->acabado ?? $recorrido->acabado;
     
             $recorrido->save();
 
