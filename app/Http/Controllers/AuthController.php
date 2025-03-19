@@ -45,6 +45,8 @@ class AuthController extends Controller
         }
     
         $user = Auth::user();
+        $user->peso = (float) $user->peso;
+        $user->estatura = (float) $user->estatura;
     
         // Verificar si el usuario aún no ha verificado su correo
         if ($user->email_verified_at == null) {
@@ -60,7 +62,17 @@ class AuthController extends Controller
         return response()->json([
             'token' => $token,
             'message' => 'Sesión iniciada con éxito',
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'nombre' => $user->nombre,
+                'apellido' => $user->apellido,
+                'peso' => $user->peso,       
+                'estatura' => $user->estatura,
+                'email' => $user->email,
+                'rol_id' => $user->rol_id,
+                'email_verified_at' => $user->email_verified_at,
+                'deleted_at' => $user->deleted_at
+            ]
         ], 200);
     }
     
