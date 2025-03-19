@@ -23,20 +23,11 @@ class BicicletaController extends Controller
      */
     public function index(Request $request)
     {
-        //
-        $bicis = Bicicleta::where('usuario_id', $request->user()->id)->get();
-        
-        $bicis = $bicis->map(function($bici){
-            return [
-                'id' => $bici->id,
-                'nombre' => $bici->nombre,
-                'recorridos' => $bici->recorridos()
-            ];
-        });
-
+        $bicis = Bicicleta::where('usuario_id', $request->user()->id)->select('id', 'nombre')->get();
+    
         return response()->json([
             'mensaje' => 'Todo salio bien',
-            'bicicletas' => $bicis
+            'data' => $bicis
         ]);
     }
 
@@ -206,7 +197,7 @@ class BicicletaController extends Controller
 
 
             return response()->json([
-                'mensaje' => 'Se edito correctamente la bici',
+                'mensaje' => 'Se editó correctamente la bici',
                 'bicicleta' => $bici
             ], 200);
 
