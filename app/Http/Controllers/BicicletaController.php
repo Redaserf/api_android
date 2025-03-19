@@ -25,11 +25,18 @@ class BicicletaController extends Controller
     {
         //
         $bicis = Bicicleta::where('usuario_id', $request->user()->id)->get();
-   
+        
+        $bicis = $bicis->map(function($bici){
+            return [
+                'id' => $bici->id,
+                'nombre' => $bici->nombre,
+                'recorridos' => $bici->recorridos()
+            ];
+        });
 
         return response()->json([
             'mensaje' => 'Todo salio bien',
-            'bicicletas' => $bicis->load('recorridos')
+            'bicicletas' => $bicis
         ]);
     }
 

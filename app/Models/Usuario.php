@@ -81,6 +81,6 @@ class Usuario extends Authenticatable
         return Recorrido::raw(function($collection){
             return $collection->find(['usuario._id' => $this->id]);//retorna los recorridos de un usuario
         });
-    }    
+    }
 
 }

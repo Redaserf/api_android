@@ -13,7 +13,9 @@ class Bicicleta extends Model
     protected $fillable = ['nombre', 'usuario_id'];
 
     public function recorridos(){
-        return $this->hasMany(Recorrido::class, 'bicicleta_id');
+        return Recorrido::raw(function($collection){
+            return $collection->find(['bicicleta_id' => $this->id]);//retorna los recorridos de un usuario
+        });
     }
 
     public function usuario(){
