@@ -90,11 +90,12 @@ class AuthController extends Controller
             'estatura' => 'required|numeric|between:1.10,2.20',
             'email' => 'required|email|max:255|unique:usuarios',
             'password' => 'required|min:8',
+            'confirm_password' => 'required|same:password',
         ], [
             'nombre.required' => 'El campo nombre es obligatorio.',
             'nombre.max' => 'El nombre no puede exceder los 50 caracteres.',
             'apellido.required' => 'El campo apellido es obligatorio.',
-            'apellido.max' => 'El nombre no puede exceder los 100 caracteres.',
+            'apellido.max' => 'El apellido no puede exceder los 100 caracteres.',
             'peso.required' => 'El campo peso es obligatorio.',
             'peso.numeric' => 'El peso debe ser un número.',
             'peso.between' => 'El peso debe estar entre 20kg y 150kg.',
@@ -107,6 +108,8 @@ class AuthController extends Controller
             'email.unique' => 'El email ya está registrado.',
             'password.required' => 'El campo contraseña es obligatorio.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'confirm_password.required' => 'El campo confirmación de contraseña es obligatorio.',
+            'confirm_password.same' => 'Las contraseñas no coinciden.',
         ]);
 
         if ($validator->fails()) {
@@ -125,6 +128,7 @@ class AuthController extends Controller
             'estatura' => $request->estatura,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'confirm_password' => Hash::make($request->confirm_password),
             'codigo' => $codigo,
             'rol_id' => 1
         ]);
