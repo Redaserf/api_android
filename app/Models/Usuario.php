@@ -28,6 +28,7 @@ class Usuario extends Authenticatable
         'codigo',
         'email',
         'password',
+        'confirm_password',
         'rol_id',
     ];
 
@@ -38,6 +39,7 @@ class Usuario extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'confirm_password',
         'codigo',
         'remember_token',
         'created_at',
