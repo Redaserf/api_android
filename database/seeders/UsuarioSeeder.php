@@ -26,6 +26,7 @@ class UsuarioSeeder extends Seeder
             'codigo' => '000000',
             'rol_id' => 3,
             'password' => Hash::make('password'),
+            'confirm_password' => Hash::make('confirm_password'),
             'email_verified_at' => now(),
 
         ]);
@@ -39,6 +40,7 @@ class UsuarioSeeder extends Seeder
             'codigo' => '000000',
             'rol_id' => 2,
             'password' => Hash::make('password'),
+            'confirm_password' => Hash::make('confirm_password'),
             'email_verified_at' => now(),
 
         ]);
