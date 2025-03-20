@@ -74,7 +74,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
-            Route::post('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
+            Route::put('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
             Route::get('imagen/{id}', [BicicletaController::class, 'imagen']);
             Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis
             Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
