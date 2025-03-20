@@ -137,7 +137,7 @@ class AdminController extends Controller
                 [
                     '$match' => [
                         'usuario.rol_id' => 2,//usuarios con rol usuario
-                        'acabado' => false //Cambiar a true
+                        'acabado' => true //Cambiar a true
                     ]
                 ],
                 [
@@ -183,7 +183,7 @@ class AdminController extends Controller
             return $collection->aggregate([
                 [
                     '$match' => [
-                        'acabado' => false
+                        'acabado' => true
                     ]//Cambiar a true para que solo traiga los recorridos acabados
                 ],
                 [
@@ -235,7 +235,15 @@ class AdminController extends Controller
         // dd($data);
         // dd($isoYear);
 
+        foreach($data as $d){
+            $labels[] = $d['mes'] . ' ' . $d['dia'];
+            $datos[] = $d['cantidadRecorridos'];
+        }
+
         // dd($recorridos);
-        return response()->json($data);
+        return response()->json([
+            'labels' => $labels,
+            'data' => $datos
+        ]);
     }
 }

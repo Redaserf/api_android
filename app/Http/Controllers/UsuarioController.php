@@ -124,7 +124,7 @@ class UsuarioController extends Controller
                 [
                     '$match' => [
                         'usuario._id' => $usuario->id,
-                        'acabado' => false,//cambiar a true para q solo traiga los recorridos acabados
+                        'acabado' => true,//cambiar a true para q solo traiga los recorridos acabados
                         'created_at' => [
                             '$gte' => $lunes,
                             '$lte' => $domingo,

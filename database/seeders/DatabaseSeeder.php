@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesSeeder::class);
         $this->call(UsuarioSeeder::class);
         $this->call(BicisSeeder::class);
+        $this->call(RecorridoSeeder::class);
 
     }
 }
