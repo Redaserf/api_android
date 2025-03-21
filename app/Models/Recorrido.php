@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Illuminate\Database\Eloquent\Model;
+use App\Models\Usuario;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
@@ -37,8 +38,8 @@ class Recorrido extends Eloquent
       'acabado', //true => el recorrido ya termino, false => el recorrido aun no termina 
     ];
 
-    public function usuario(){
-        return $this->belongsTo(Usuario::class, 'usuario_id');
+    public function usuarioRecorrido(){
+        return Usuario::where('id', $this->usuario->_id)->first();
     }
 
     public function bicicleta(){

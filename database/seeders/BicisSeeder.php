@@ -18,25 +18,25 @@ class BicisSeeder extends Seeder
         DB::table('bicicletas')->insert([
             [
                 'usuario_id' => 1,
-                'nombre' => 'Bicicleta Max',
+                'nombre' => 'Bicicleta USUARIO 111111111',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'usuario_id' => 1,
-                'nombre' => 'Bicicleta Aarón',
+                'nombre' => 'Bicicleta USUARIO 111111111',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'usuario_id' => 2,
-                'nombre' => 'Bicicleta Max',
+                'nombre' => 'Bicicleta USUARIO 222222222',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'usuario_id' => 2,
-                'nombre' => 'Bicicleta Aarón',
+                'nombre' => 'Bicicleta USUARIO 222222222',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -16,6 +16,7 @@ class RecorridoFactory extends Factory
      */
     public function definition()
     {
+        $idUsuario = \App\Models\Usuario::inRandomOrder()->value('id');
         return [
             //
             'calorias' => $this->faker->randomNumber(),
@@ -24,8 +25,11 @@ class RecorridoFactory extends Factory
             'velocidad_promedio' => $this->faker->randomNumber(),
             'velocidad_maxima' => $this->faker->randomNumber(),
             'distancia_recorrida' => $this->faker->randomNumber(),
-            'usuario' => $this->faker->randomNumber(),
-            'bicicleta_id' => $this->faker->randomNumber(),
+            'usuario' => [
+                '_id' => $idUsuario,
+                'rol_id' => 2,
+            ],
+            'bicicleta_id' => \App\Models\Bicicleta::where('usuario_id', $idUsuario)->inRandomOrder()->value('id'),
             'temperatura' => $this->faker->randomNumber(),
             'suma_velocidad' => [
                 'suma' => $this->faker->randomNumber(),
