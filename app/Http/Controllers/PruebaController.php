@@ -83,9 +83,9 @@ class PruebaController extends Controller
             ], 404);
         }
 
-        $x = $request->acelerometro['x'];
-        $y = $request->acelerometro['y'];
-        $z = $request->acelerometro['z'];
+        $x = $request->acelerometro[0];
+        $y = $request->acelerometro[1];
+        $z = $request->acelerometro[2];
 
         $velocidad = $this->calcularVelocidad($x, $y, $z);
 
