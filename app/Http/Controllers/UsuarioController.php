@@ -24,7 +24,7 @@ class UsuarioController extends Controller
                 'nombre' => 'string|max:50|nullable',
                 'apellido' => 'string|max:100|nullable',
                 'peso' => 'numeric|between:20,150|nullable',
-                'estatura' => 'required|numeric|between:1.10,2.20',
+                'estatura' => 'numeric|between:1.10,2.20|nullable',
                 'email' => [
                     'nullable',
                     'string',
@@ -40,7 +40,6 @@ class UsuarioController extends Controller
                 'email.email' => 'El email no es válido.',
                 'email.max' => 'El email no puede exceder los 255 caracteres.',
                 'email.unique' => 'El email ya está registrado.',
-                'estatura.required' => 'El campo estatura es obligatorio.',
                 'estatura.numeric' => 'La estatura debe ser un número.',
                 'estatura.between' => 'La estatura debe estar entre 1.10m y 2.20m.',
             ]);
