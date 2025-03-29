@@ -236,6 +236,7 @@ class RecorridoController extends Controller
             })
             ->map(function ($recorrido) {
                 return [
+                    'id' => $recorrido->id,
                     'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
                     'calorias' => $recorrido->calorias,
                     'tiempo' => $recorrido->tiempo,

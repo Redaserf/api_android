@@ -138,11 +138,10 @@ class UsuarioController extends Controller
                     ],
                 ],
                 [
-                   '$group' => [
+                '$group' => [
                         '_id' => [
-                            '$dateToString' => [
-                                'format' => "%Y-%m-%d",
-                                'date' => '$created_at'
+                            '$isoDayOfWeek' => [
+                                '$created_at'
                             ]
                         ],//agrupa por dias
                         'distancia_recorrida' => ['$sum' => '$distancia_recorrida'], //distancia recorrida por dia
@@ -155,25 +154,47 @@ class UsuarioController extends Controller
                                 ]
                             ]
                         ], //duracion total por dia en minutos
-                   ]
-                ],
-                [
-                    '$addFields' => [
-                      'diaSemana' => [ '$isoDayOfWeek' => [ '$toDate' => '$_id' ] ]
-                    ]
+                ]
                 ],
                 [
                     '$sort' => [
-                        'diaSemana' => 1
+                        '_id' => 1
                     ]
                 ],//ordena de lunes a domingo ej: lunes = 1, martes = 2, miercoles = 3, jueves = 4, viernes = 5, sabado = 6, domingo = 7
             ]);
         });//recorridos ya viene por dia, Lunes, Martes, Miercoles, Jueves, Viernes, Sabado, Domingo o sea q trae 7 documentos y trae la distancia, calorias, duracion por dia
-
         // dd($recorridos);
 
+        $labels = [];//aqui guardamos los datos de cada dia de la semana
+        $data = [
+            'distancias' => [],
+            'calorias' => [],
+            'duraciones' => [],
+        ];
+
+        $diasSemana = [
+            1 => 'Lunes',
+            2 => 'Martes',
+            3 => 'Miercoles',
+            4 => 'Jueves',
+            5 => 'Viernes',
+            6 => 'Sabado',
+            7 => 'Domingo'
+        ];
+
+        foreach($recorridos as $recorrido) {
+            $dia = $recorrido->_id;
+            $labels[] = [$diasSemana[$dia]];
+        }//sacar el dia de cada recorrido y guardarlo en el array labels
+
+        foreach($recorridos as $recorrido) {
+            $data['distancias'][] = $recorrido->distancia_recorrida;
+            $data['calorias'][] = $recorrido->calorias;
+            $data['duraciones'][] = $recorrido->duracion_final;
+        }//sacar la distancia, calorias y duracion de cada recorrido y guardarlo en el array data
+
         $estadisticasGenerales = [
-            'distancia' => [
+            'distancias' => [
                 'total' => $recorridos->sum('distancia_recorrida'),
                 'promedio' => $recorridos->avg('distancia_recorrida') ?? 0,
                 'maxima' => $recorridos->max('distancia_recorrida') ?? 0,
@@ -185,7 +206,7 @@ class UsuarioController extends Controller
                 'maxima' => $recorridos->max('calorias') ?? 0,
                 'minima' => $recorridos->min('calorias') ?? 0,
             ],
-            'duracion' => [
+            'duraciones' => [
                 'total' => $recorridos->sum('duracion_final'),
                 'promedio' => $recorridos->avg('duracion_final') ?? 0,
                 'maxima' => $recorridos->max('duracion_final') ?? 0,
@@ -195,11 +216,11 @@ class UsuarioController extends Controller
 
         // dd($estadisticasGenerales);
 
-       
         return response()->json([
             'message' => 'Estadísticas de la semana.',
             'generales' => $estadisticasGenerales,
-            'porDiaSemana' => $recorridos,
+            'data' => $data,
+            'labels' => $labels,
         ], 200);
 
     }
@@ -216,19 +237,20 @@ class UsuarioController extends Controller
                 [
                     '$match' => [
                         'usuario._id' => $usuario->id,
-                        'acabado' => true,//cambiar a true para q solo traiga los recorridos acabados
+                        'acabado' => true, // Solo recorridos terminados
                     ],
                 ],
                 [
                     '$group' => [
                         '_id' => null,
+                        'total_recorridos' => ['$sum' => 1], // Contar la cantidad de recorridos
                         'distancia_recorrida' => ['$sum' => '$distancia_recorrida'],
                         'calorias' => ['$sum' => '$calorias'],
                         'duracion_final' => [
                             '$sum' => [
                                 '$divide' => [
                                     '$duracion_final',
-                                    60//duracion en minutos
+                                    60 // Convertir duración a minutos
                                 ]
                             ]
                         ],
@@ -241,11 +263,12 @@ class UsuarioController extends Controller
     
         return response()->json([
             'msg' => 'Resumen total de recorridos.',
+            'recorridos' => $recorridos->total_recorridos ?? 0,
             'distancia' => $recorridos->distancia_recorrida ?? 0,
             'calorias' => $recorridos->calorias ?? 0,
             'duracion' => $recorridos->duracion_final ?? 0,
         ], 200);
-    }
+    }    
 
     
 }

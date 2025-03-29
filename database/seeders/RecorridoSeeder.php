@@ -16,7 +16,7 @@ class RecorridoSeeder extends Seeder
     public function run()
     {
         //
-        Recorrido::factory(1000)->create();
+        Recorrido::factory(50)->create();
 
     }
 }
