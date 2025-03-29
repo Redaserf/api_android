@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Recorrido;
 use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PruebaController extends Controller
@@ -102,6 +103,19 @@ class PruebaController extends Controller
         return response()->json([
             'message' => 'Datos guardados correctamente'
         ], 200);
+    }
+
+    private function calcularVelocidad($ax, $ay, $az)
+    {
+        Log::info("Valores de acelerómetro: X={$ax}, Y={$ay}, Z={$az}");
+
+        $ax = floatval($ax);
+        $ay = floatval($ay);
+        $az = floatval($az);
+
+        $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2) + pow($az, 2));
+
+        return $aceleracion * 3.6;
     }
 
 
