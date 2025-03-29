@@ -96,8 +96,8 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 
             // =======================[ Estadisticas Usuario ]=============================
             // estadisticas del usuario logeado
-            Route::post('semana/estadisticas', [UsuarioController::class, 'estadisticasDeLaSemana']);
-
+            Route::get('semana/estadisticas', [UsuarioController::class, 'estadisticasDeLaSemana']);
+            
             //resumen total de calorias, distancia y tiempo recorrido del usuario logeado
             Route::get('resumen/usuario', [UsuarioController::class, 'resumenTotal']);
 

@@ -37,8 +37,8 @@ class RecorridoFactory extends Factory
             ],
             'duracion_final' => $this->faker->randomNumber(),
             'acabado' => true,
-            'created_at' => $this->faker->dateTime(),
-            'updated_at' => $this->faker->dateTime(),
+            'created_at' => $this->faker->dateTimeBetween(\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()),
+            'updated_at' => $this->faker->dateTimeBetween(\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()),
         ];
     }
 }
