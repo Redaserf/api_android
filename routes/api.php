@@ -136,7 +136,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
     // =======================[ Recibir datos de la raspberry ]=============================
     Route::post('v1/sensores', [CalculosController::class, 'calcularDatosGuardarRecorridoEnMongo']);
 
-    Route::get('v1/prueba/actualizar',[PruebaController::class,'simulacionRecorrido']);
+    Route::post('v1/prueba/actualizar',[PruebaController::class,'simulacionRecorrido']);
     Route::get('v1/prueba/conexion',[PruebaController::class,'pruebaDeConexion']);
     Route::post("json/raspberry",[PruebaController::class, 'jsonRaspberry']);
     // == [ Re-envio de contra - DLC] ==
