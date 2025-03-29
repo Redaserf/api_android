@@ -17,7 +17,6 @@ class PruebaController extends Controller
         ], 200);
     }
 
-
     public function jsonRaspberry(Request $request)
     {
         $validaciones = Validator::make($request->all(), [
@@ -41,18 +40,14 @@ class PruebaController extends Controller
             ], 422);
         }
 
-
-
         return response()->json([
-            "msg"=>"Datos recibidos corrrectamente",
-            "data"=>$request->all()
-        ],200);
+            "msg" => "Datos recibidos corrrectamente",
+            "data" => $request->all()
+        ], 200);
     }
-
 
     public function simulacionRecorrido(Request $request)
     {
-
         $validaciones = Validator::make($request->all(), [
             'bici_id' => 'required',
             'temperatura' => 'required',
@@ -69,7 +64,7 @@ class PruebaController extends Controller
             'giroscopio.required' => 'El giroscopio es requerido',
         ]);
 
-        if($validaciones->fails()){
+        if ($validaciones->fails()) {
             return response()->json([
                 'message' => 'Datos incorrectos',
                 'errors' => $validaciones->errors()
@@ -78,7 +73,7 @@ class PruebaController extends Controller
 
         $recorrido = Recorrido::where('_id', '67e5aeded3fa2a015a089212')->first();
 
-        if(!$recorrido){
+        if (!$recorrido) {
             return response()->json([
                 'message' => 'Recorrido no encontrado'
             ], 404);
@@ -91,13 +86,17 @@ class PruebaController extends Controller
         $velocidad = $this->calcularVelocidad($x, $y, $z);
 
         $recorrido->velocidad = $velocidad;
-        if($recorrido->velocidad_maxima < $velocidad){
+        if ($recorrido->velocidad_maxima < $velocidad) {
             $recorrido->velocidad_maxima = $velocidad;
-        }//si la velocidad actual es mayor a la maxima se actualiza la maxima
-        $recorrido->suma_velocidad['suma'] += $velocidad;
-        $recorrido->suma_velocidad['cantidad'] += 1;
+        }
 
-        $recorrido->velocidad_promedio = $recorrido->suma_velocidad['suma'] / $recorrido->suma_velocidad['cantidad'];//se calcula el promedio de las velocidades
+        // Se modifica el array en una variable temporal para evitar la modificación indirecta
+        $sumaVelocidad = $recorrido->suma_velocidad;
+        $sumaVelocidad['suma'] += $velocidad;
+        $sumaVelocidad['cantidad'] += 1;
+        $recorrido->suma_velocidad = $sumaVelocidad;
+
+        $recorrido->velocidad_promedio = $recorrido->suma_velocidad['suma'] / $recorrido->suma_velocidad['cantidad'];
         $recorrido->save();
 
         return response()->json([
@@ -117,6 +116,4 @@ class PruebaController extends Controller
 
         return $aceleracion * 3.6;
     }
-
-
 }
