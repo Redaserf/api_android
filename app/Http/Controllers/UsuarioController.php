@@ -216,19 +216,20 @@ class UsuarioController extends Controller
                 [
                     '$match' => [
                         'usuario._id' => $usuario->id,
-                        'acabado' => true,//cambiar a true para q solo traiga los recorridos acabados
+                        'acabado' => true, // Solo recorridos terminados
                     ],
                 ],
                 [
                     '$group' => [
                         '_id' => null,
+                        'total_recorridos' => ['$sum' => 1], // Contar la cantidad de recorridos
                         'distancia_recorrida' => ['$sum' => '$distancia_recorrida'],
                         'calorias' => ['$sum' => '$calorias'],
                         'duracion_final' => [
                             '$sum' => [
                                 '$divide' => [
                                     '$duracion_final',
-                                    60//duracion en minutos
+                                    60 // Convertir duración a minutos
                                 ]
                             ]
                         ],
@@ -241,11 +242,12 @@ class UsuarioController extends Controller
     
         return response()->json([
             'msg' => 'Resumen total de recorridos.',
+            'recorridos' => $recorridos->total_recorridos ?? 0,
             'distancia' => $recorridos->distancia_recorrida ?? 0,
             'calorias' => $recorridos->calorias ?? 0,
             'duracion' => $recorridos->duracion_final ?? 0,
         ], 200);
-    }
+    }    
 
     
 }

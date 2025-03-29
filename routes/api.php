@@ -75,17 +75,17 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
             Route::put('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
-            Route::get('imagen/{id}', [BicicletaController::class, 'imagen']);
             Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis
+            Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
             Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
 
             // ===[ Recorridos ]===
             Route::post('recorrido', [RecorridoController::class, 'store']); // Crear
             Route::put('recorrido/{id}', [RecorridoController::class, 'update'])->where('id', '[0-9]+'); // Editar
             Route::get('recorridos', [RecorridoController::class, 'recorridosUsuario']); // Traer todos los recorridos (por usuario)
-            Route::get('recorrido', [RecorridoController::class, 'index']); // Traer todos los recorridos, este es el de hugo
+            // Route::get('recorrido', [RecorridoController::class, 'index']); // Traer todos los recorridos, este es el de hugo
             Route::get('recorrido/{id}', [RecorridoController::class, 'show'])->where('id', '[0-9]+'); // Traer un recorrido
-            Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy'])->where('id', '[0-9]+'); // Eliminar un recorrido
+            Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy']); // Eliminar un recorrido
             Route::get('recorridos/semana', [RecorridoController::class, 'recorridosPorSemana']);
             Route::get('recorridos/mes', [RecorridoController::class, 'recorridosPorMes']);
 

@@ -77,7 +77,7 @@ class BicicletaController extends Controller
         if ($validaciones->fails()) {
             return response()->json([
                 'mensaje' => 'Error en la validación de los datos',
-                'errores' => $validaciones->errors()
+                'errors' => $validaciones->errors()
             ], 422);
         }
     
@@ -126,7 +126,7 @@ class BicicletaController extends Controller
         if($bici){
             return response()->json([
                 'mensaje' => 'Todo salio bien',
-                'bicicleta' => $bici
+                'data' => $bici
             ], 200);
         }else{
             return response()->json([
@@ -157,9 +157,10 @@ class BicicletaController extends Controller
     {
         //
         $validaciones = Validator::make($request->all(), [
-            'nombre' => 'string|max: 60',
+            'nombre' => 'required|string|max: 60',
             // 'imagen' => 'file|image|mimes:jpg,jpeg,png',
         ], [
+            'nombre.required' => 'El nombre es un campo obligatorio',
             'nombre.string' => 'El nombre debe ser de tipo string',
             'nombre.max' => 'El nombre debe ser de menos de 60 caracteres',
 
@@ -171,7 +172,7 @@ class BicicletaController extends Controller
         if($validaciones->fails()){
             return response()->json([
                 'mensaje' => 'Error en la validacion de los datos',
-                'errores' => $validaciones->errors()
+                'errors' => $validaciones->errors()
             ], 422);
         }
         
@@ -227,7 +228,7 @@ class BicicletaController extends Controller
 
             return response()->json([
                 'mensaje' => 'Se elimino correctamente la bici',
-                'bicicleta' => $bici
+                'data' => $bici
             ], 200);
 
         }else{

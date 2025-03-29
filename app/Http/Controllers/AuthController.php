@@ -89,7 +89,6 @@ class AuthController extends Controller
         ], 200);
     }
 
-
     // =====[ Registro de usuario ]=====
 
     public function register(Request $request)
