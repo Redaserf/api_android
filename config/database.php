@@ -65,16 +65,24 @@ return [
 
         'mongodb' => [
             'driver'   => 'mongodb',
-            'host'     => env('MONGODB_HOST', '127.0.0.1'),
+            'host'     => [
+                '18.191.106.106',  // Primario (priority 3)
+                '3.148.140.165',   // Secundario 1 (priority 2)
+                '3.130.169.18'     // Secundario 2 (priority 1)
+            ],
             'port'     => env('MONGODB_PORT', 27017),
-            'database' => env('MONGODB_DATABASE', 'integradora2'),
-            'username' => env('MONGODB_USERNAME', ''),
-            'password' => env('MONGODB_PASSWORD', ''),
+            'database' => env('MONGODB_DATABASE', 'laravel'),
+            'username' => env('MONGODB_USERNAME', 'admin'),
+            'password' => env('MONGODB_PASSWORD', 'Deiters2024'),
             'options'  => [
-                'database' => env('MONGODB_AUTHENTICATION_DATABASE', 'admin'), // Base de datos para autenticar
+                'replicaSet' => 'rs0',  // Nombre de tu Replica Set
+                'readPreference' => 'primaryPreferred', // Lee del primario, pero puede fallar a secundarios
+                'authSource' => 'admin', // Base de datos donde está el usuario
+                'tls' => false, // Cambiar a true si usas TLS/SSL
+                'connectTimeoutMS' => 5000,
+                'socketTimeoutMS' => 30000
             ]
         ],
-
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
