@@ -15,14 +15,14 @@ class CalculosController extends Controller
     {
         
         $validaciones = Validator::make($request->all(), [
-            'recorrido_id' => 'required',
+            'bicicleta_id' => 'required',
             'temperatura' => 'required',
             'humedad' => 'required',
             'luz_analogica' => 'required',
             'acelerometro' => 'required',
             'giroscopio' => 'required',
         ], [
-            'recorrido_id.required' => 'El id del recorrido es requerido',
+            'bicicleta_id.required' => 'El id del recorrido es requerido',
             'temperatura.required' => 'La temperatura es requerida',
             'humedad.required' => 'La humedad es requerida',
             'luz_analogica.required' => 'La luz analógica es requerida',
@@ -37,7 +37,7 @@ class CalculosController extends Controller
             ], 422);
         }
 
-        $recorrido = Recorrido::find($request->recorrido_id);
+        $recorrido = Recorrido::where('bicicleta_id', $request->bicicleta_id)->where('acabado', false)->first();//el recorrido iniciado por id de la bicicleta q manda la rasp
 
         if(!$recorrido){
             return response()->json([
