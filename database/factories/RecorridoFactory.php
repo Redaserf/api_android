@@ -19,8 +19,8 @@ class RecorridoFactory extends Factory
         $idUsuario = \App\Models\Usuario::inRandomOrder()->value('id');
         return [
             //
-            'calorias' => $this->faker->randomFloat(2, 0, 100),
-            'tiempo' => $this->faker->randomNumber(),
+            'calorias' => $this->faker->randomFloat(),
+            'tiempo' => $this->faker->time('H:i:s'),
             'velocidad' => $this->faker->randomNumber(),
             'velocidad_promedio' => $this->faker->randomNumber(),
             'velocidad_maxima' => $this->faker->randomNumber(),
