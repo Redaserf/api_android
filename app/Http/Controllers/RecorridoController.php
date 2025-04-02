@@ -126,7 +126,7 @@ class RecorridoController extends Controller
      * @param  \App\Models\Recorrido  $recorrido
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)//falta meterle lo de distancia_final q no es requerida
+    public function update(Request $request, $id)
     {
         //
         $validaciones = Validator::make($request->all(), [
@@ -223,7 +223,7 @@ class RecorridoController extends Controller
 
     //=================== [ De aqui para abajo ya todo funciona con mongoDB @hugo]=============================
 
-    public function recorridosUsuario()
+    public function recorridosUsuario(Request $request)
     {
         $usuario = Auth::user();
     
@@ -231,28 +231,40 @@ class RecorridoController extends Controller
             return response()->json(['message' => 'Usuario no autenticado'], 401);
         }
     
+        $page = (int) $request->get('page', 1);
+        $perPage = (int) $request->get('per_page', 8);
+    
+        // 🔁 Traer todos los recorridos (puedes optimizarlo luego si quieres paginar desde Mongo)
         $recorridos = $usuario->recorridos(function ($query) {
             $query->with('bicicleta');
-            })
-            ->map(function ($recorrido) {
-                return [
-                    'id' => $recorrido->id,
-                    'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
-                    'calorias' => $recorrido->calorias,
-                    'tiempo' => $recorrido->tiempo,
-                    'velocidad_promedio' => $recorrido->velocidad_promedio,
-                    'velocidad_maxima' => $recorrido->velocidad_maxima,
-                    'distancia_recorrida' => $recorrido->distancia_recorrida,
-                    'temperatura' => $recorrido->temperatura,
-                    'created_at' => $recorrido->created_at->toDateTimeString(),
-                ];
-            });
+        });
+    
+        $total = $recorridos->count();
+        $recorridosPaginados = $recorridos->forPage($page, $perPage); // 👈 paginación in-memory
+    
+        $formatted = $recorridosPaginados->map(function ($recorrido) {
+            return [
+                'id' => $recorrido->id,
+                'bicicleta_nombre' => optional($recorrido->bicicleta())->nombre ?? 'Sin nombre',
+                'calorias' => $recorrido->calorias,
+                'tiempo' => $recorrido->tiempo,
+                'velocidad_promedio' => $recorrido->velocidad_promedio,
+                'velocidad_maxima' => $recorrido->velocidad_maxima,
+                'distancia_recorrida' => $recorrido->distancia_recorrida,
+                'temperatura' => $recorrido->temperatura,
+                'created_at' => $recorrido->created_at->toDateTimeString(),
+            ];
+        });
     
         return response()->json([
-            'message' => 'Recorridos obtenidos con éxito',
-            'recorridos' => $recorridos,
+            'data' => [
+                'data' => $formatted->values(),
+                'total' => $total,
+                'per_page' => $perPage,
+                'current_page' => $page
+            ]
         ], 200);
-    }
+    }    
     
     public function recorridosPorSemana()
     {
