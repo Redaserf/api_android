@@ -223,7 +223,40 @@ class RecorridoController extends Controller
 
     //=================== [ De aqui para abajo ya todo funciona con mongoDB @hugo]=============================
 
-    public function recorridosUsuario(Request $request)
+    // para iOS
+    public function recorridosUsuario()
+    {
+        $usuario = Auth::user();
+    
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+    
+        $recorridos = $usuario->recorridos(function ($query) {
+            $query->with('bicicleta');
+            })
+            ->map(function ($recorrido) {
+                return [
+                    'id' => $recorrido->id,
+                    'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
+                    'calorias' => $recorrido->calorias,
+                    'tiempo' => $recorrido->tiempo,
+                    'velocidad_promedio' => $recorrido->velocidad_promedio,
+                    'velocidad_maxima' => $recorrido->velocidad_maxima,
+                    'distancia_recorrida' => $recorrido->distancia_recorrida,
+                    'temperatura' => $recorrido->temperatura,
+                    'created_at' => $recorrido->created_at->toDateTimeString(),
+                ];
+            });
+    
+        return response()->json([
+            'message' => 'Recorridos obtenidos con éxito',
+            'recorridos' => $recorridos,
+        ], 200);
+    }
+    
+    // para WEB
+    public function recorridosUsuarioPaginado(Request $request)
     {
         $usuario = Auth::user();
     
@@ -234,13 +267,12 @@ class RecorridoController extends Controller
         $page = (int) $request->get('page', 1);
         $perPage = (int) $request->get('per_page', 8);
     
-        // 🔁 Traer todos los recorridos (puedes optimizarlo luego si quieres paginar desde Mongo)
         $recorridos = $usuario->recorridos(function ($query) {
             $query->with('bicicleta');
         });
     
         $total = $recorridos->count();
-        $recorridosPaginados = $recorridos->forPage($page, $perPage); // 👈 paginación in-memory
+        $recorridosPaginados = $recorridos->forPage($page, $perPage);
     
         $formatted = $recorridosPaginados->map(function ($recorrido) {
             return [
@@ -264,8 +296,8 @@ class RecorridoController extends Controller
                 'current_page' => $page
             ]
         ], 200);
-    }    
-    
+    }
+
     public function recorridosPorSemana()
     {
         $usuario = Auth::user();

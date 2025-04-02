@@ -22,7 +22,20 @@ class BicicletaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+
+     // para iOS
+     public function index(Request $request)
+     {
+         $bicis = Bicicleta::where('usuario_id', $request->user()->id)->select('id', 'nombre')->get();
+     
+         return response()->json([
+             'mensaje' => 'Todo salio bien',
+             'data' => $bicis
+         ]);
+     }
+
+     // para WEB
+    public function indexPaginado(Request $request)
     {
         $perPage = $request->get('per_page', 5);
     
@@ -35,7 +48,6 @@ class BicicletaController extends Controller
             'data' => $bicis
         ]);
     }
-    
 
     // public function imagen(Request $request, $id){
 
