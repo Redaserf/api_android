@@ -38,6 +38,12 @@ class Recorrido extends Eloquent
       'acabado', //true => el recorrido ya termino, false => el recorrido aun no termina 
     ];
 
+    protected $casts = [
+        'duracion_final' => 'double',
+        'calorias' => 'double',
+        'distancia_recorrida' => 'double',
+    ];
+    
     public function usuarioRecorrido(){
         return Usuario::where('id', $this->usuario->_id)->first();
     }

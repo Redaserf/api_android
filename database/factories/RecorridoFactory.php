@@ -19,12 +19,12 @@ class RecorridoFactory extends Factory
         $idUsuario = \App\Models\Usuario::inRandomOrder()->value('id');
         return [
             //
-            'calorias' => $this->faker->randomNumber(),
+            'calorias' => $this->faker->randomFloat(2, 0, 100),
             'tiempo' => $this->faker->randomNumber(),
             'velocidad' => $this->faker->randomNumber(),
             'velocidad_promedio' => $this->faker->randomNumber(),
             'velocidad_maxima' => $this->faker->randomNumber(),
-            'distancia_recorrida' => $this->faker->randomNumber(),
+            'distancia_recorrida' => $this->faker->randomFloat(2, 0, 100),
             'usuario' => [
                 '_id' => $idUsuario,
                 'rol_id' => 2,
@@ -35,7 +35,7 @@ class RecorridoFactory extends Factory
                 'suma' => $this->faker->randomNumber(),
                 'cantidad' => $this->faker->randomNumber(),
             ],
-            'duracion_final' => $this->faker->randomNumber(),
+            'duracion_final' => $this->faker->randomFloat(2, 0, 100),
             'acabado' => true,
             'created_at' => $this->faker->dateTimeBetween(\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()),
             'updated_at' => $this->faker->dateTimeBetween(\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()),
