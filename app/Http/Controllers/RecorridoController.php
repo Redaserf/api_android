@@ -126,7 +126,7 @@ class RecorridoController extends Controller
      * @param  \App\Models\Recorrido  $recorrido
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)//falta meterle lo de distancia_final q no es requerida
+    public function update(Request $request, $id)
     {
         //
         $validaciones = Validator::make($request->all(), [
@@ -223,6 +223,7 @@ class RecorridoController extends Controller
 
     //=================== [ De aqui para abajo ya todo funciona con mongoDB @hugo]=============================
 
+    // para iOS
     public function recorridosUsuario()
     {
         $usuario = Auth::user();
@@ -254,6 +255,49 @@ class RecorridoController extends Controller
         ], 200);
     }
     
+    // para WEB
+    public function recorridosUsuarioPaginado(Request $request)
+    {
+        $usuario = Auth::user();
+    
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+    
+        $page = (int) $request->get('page', 1);
+        $perPage = (int) $request->get('per_page', 8);
+    
+        $recorridos = $usuario->recorridos(function ($query) {
+            $query->with('bicicleta');
+        });
+    
+        $total = $recorridos->count();
+        $recorridosPaginados = $recorridos->forPage($page, $perPage);
+    
+        $formatted = $recorridosPaginados->map(function ($recorrido) {
+            return [
+                'id' => $recorrido->id,
+                'bicicleta_nombre' => optional($recorrido->bicicleta())->nombre ?? 'Sin nombre',
+                'calorias' => $recorrido->calorias,
+                'tiempo' => $recorrido->tiempo,
+                'velocidad_promedio' => $recorrido->velocidad_promedio,
+                'velocidad_maxima' => $recorrido->velocidad_maxima,
+                'distancia_recorrida' => $recorrido->distancia_recorrida,
+                'temperatura' => $recorrido->temperatura,
+                'created_at' => $recorrido->created_at->toDateTimeString(),
+            ];
+        });
+    
+        return response()->json([
+            'data' => [
+                'data' => $formatted->values(),
+                'total' => $total,
+                'per_page' => $perPage,
+                'current_page' => $page
+            ]
+        ], 200);
+    }
+
     public function recorridosPorSemana()
     {
         $usuario = Auth::user();

@@ -75,19 +75,30 @@ class AdminController extends Controller
         return response()->json($usuario);
     }
 
-    public function todosLosUsuarios()
+    public function todosLosUsuarios(Request $request)
     {
-        $usuarios = Usuario::where('rol_id', 2)->get();
+        $perPage = (int) $request->get('per_page', 8);
+        $usuarios = Usuario::where('rol_id', 2)->paginate($perPage);
+    
+        return response()->json([
+            'data' => $usuarios->items(),
+            'total' => $usuarios->total(),
+            'per_page' => $usuarios->perPage(),
+            'current_page' => $usuarios->currentPage()
+        ]);
+    }    
 
-        return response()->json($usuarios);
-    }
+    public function bicicletasConUsuario(Request $request){
 
+        $perPage = (int) $request->get('per_page', 8);
+        $bicicletas = Bicicleta::with('usuario')->paginate($perPage);
 
-    public function bicicletasConUsuario(){
-
-        $bicicletas = Bicicleta::with('usuario')->get();
-
-        return response()->json($bicicletas, 200);
+        return response()->json([
+            'data' => $bicicletas->items(),
+            'total' => $bicicletas->total(),
+            'per_page' => $bicicletas->perPage(),
+            'current_page' => $bicicletas->currentPage()
+        ]);
     }
     
     //consultas para graficas y demas estadisticas en vista de admin

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bicicleta;
+use App\Models\Recorrido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\File;
@@ -21,12 +22,29 @@ class BicicletaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+
+     // para iOS
+     public function index(Request $request)
+     {
+         $bicis = Bicicleta::where('usuario_id', $request->user()->id)->select('id', 'nombre')->get();
+     
+         return response()->json([
+             'mensaje' => 'Todo salio bien',
+             'data' => $bicis
+         ]);
+     }
+
+     // para WEB
+    public function indexPaginado(Request $request)
     {
-        $bicis = Bicicleta::where('usuario_id', $request->user()->id)->select('id', 'nombre')->get();
+        $perPage = $request->get('per_page', 5);
+    
+        $bicis = Bicicleta::where('usuario_id', $request->user()->id)
+            ->select('id', 'nombre')
+            ->paginate($perPage);
     
         return response()->json([
-            'mensaje' => 'Todo salio bien',
+            'mensaje' => 'Todo salió bien',
             'data' => $bicis
         ]);
     }
@@ -217,23 +235,20 @@ class BicicletaController extends Controller
      */
     public function destroy($id)
     {
-        //
         $bici = Bicicleta::findOrFail($id);
-
-        if($bici){
-            // $rutaRelativa = str_replace( config("app_url.url") . "/storage/", "", $bici->imagen);
-
-            // Storage::disk('public')->delete($rutaRelativa);
+    
+        if ($bici) {
+            Recorrido::where('bicicleta_id', $bici->id)->delete();
+    
             $bici->delete();
-
+    
             return response()->json([
-                'mensaje' => 'Se elimino correctamente la bici',
+                'mensaje' => 'Se eliminó correctamente la bici y sus recorridos',
                 'data' => $bici
             ], 200);
-
-        }else{
+        } else {
             return response()->json([
-                'mensaje' => 'No se encontro la bici'
+                'mensaje' => 'No se encontró la bici'
             ], 404);
         }
     }
