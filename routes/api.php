@@ -145,6 +145,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
     Route::post('v1/prueba/actualizar',[PruebaController::class,'simulacionRecorrido']);
     Route::get('v1/prueba/conexion',[PruebaController::class,'pruebaDeConexion']);
     Route::post("json/raspberry",[PruebaController::class, 'jsonRaspberry']);
+    Route::post("/debug-headers",[PruebaController::class, 'debug']);
     // == [ Re-envio de contra - DLC] ==
 
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');

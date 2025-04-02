@@ -116,4 +116,12 @@ class PruebaController extends Controller
 
         return $aceleracion * 3.6;
     }
+
+    public function debug(){
+        return response()->json([
+            'headers' => request()->header(),
+            'ip' => request()->ip(),
+            'host' => request()->getHost()
+        ]);
+    }
 }
