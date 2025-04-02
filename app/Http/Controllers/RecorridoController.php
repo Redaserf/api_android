@@ -243,6 +243,7 @@ class RecorridoController extends Controller
                     'velocidad_promedio' => $recorrido->velocidad_promedio,
                     'velocidad_maxima' => $recorrido->velocidad_maxima,
                     'distancia_recorrida' => $recorrido->distancia_recorrida,
+                    'temperatura' => $recorrido->temperatura,
                     'created_at' => $recorrido->created_at->toDateTimeString(),
                 ];
             });
