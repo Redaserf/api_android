@@ -24,7 +24,7 @@ class BicisSeeder extends Seeder
             ],
             [
                 'usuario_id' => 1,
-                'nombre' => 'Bicicleta USUARIO 111111111',
+                'nombre' => 'Bicicleta USUARIO 2222222',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
