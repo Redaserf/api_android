@@ -20,7 +20,7 @@ class RecorridoFactory extends Factory
         return [
             //
             'calorias' => $this->faker->randomNumber(),
-            'tiempo' => $this->faker->randomNumber(),
+            'tiempo' => $this->faker->time('H:i:s'),
             'velocidad' => $this->faker->randomNumber(),
             'velocidad_promedio' => $this->faker->randomNumber(),
             'velocidad_maxima' => $this->faker->randomNumber(),

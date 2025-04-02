@@ -46,8 +46,8 @@ class UsuarioController extends Controller
     
             if ($validator->fails()) {
                 return response()->json([
-                    'message' => 'Errores en los datos enviados.',
-                    'errors' => $validator->errors(),
+                    'mensaje' => 'Errores en los datos enviados.',
+                    'errores' => $validator->errors(),
                 ], 422);
             }
     
@@ -72,8 +72,8 @@ class UsuarioController extends Controller
         } catch (\Throwable $e) {
             Log::error('Error al actualizar el perfil: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Error al actualizar el perfil.',
-                'error' => $e->getMessage(),
+                'mensaje' => 'Error al actualizar el perfil.',
+                'errores' => $e->getMessage(),
             ], 500);
         }
     }
