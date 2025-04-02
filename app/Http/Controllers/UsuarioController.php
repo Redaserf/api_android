@@ -189,7 +189,7 @@ class UsuarioController extends Controller
         foreach($recorridos as $recorrido) {
             $data['distancias'][] = $recorrido->distancia_recorrida;
             $data['calorias'][] = $recorrido->calorias;
-            $data['duraciones'][] = $recorrido->duracion_final;
+            $data['duraciones'][] = $recorrido->duracion_final / 60;//aqui guardo la duracion en minutos
         }//sacar la distancia, calorias y duracion de cada recorrido y guardarlo en el array data
 
         $estadisticasGenerales = [

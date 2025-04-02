@@ -176,6 +176,13 @@ class RecorridoController extends Controller
     
             $recorrido->save();
 
+            if($recorrido->acabado){
+                [$horas, $minutos, $segundos] = explode(':', $recorrido->tiempo);
+                $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
+                $recorrido->duracion_final = $tiempoSegundos;
+                $recorrido->save();
+            }
+
 
             return response()->json([
                 'mensaje' => 'El recorrido se edito correctamente',
