@@ -87,7 +87,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 
             // ===[ Recorridos ]===
             Route::post('recorrido', [RecorridoController::class, 'store']); // Crear
-            Route::put('recorrido/{id}', [RecorridoController::class, 'update'])->where('id', '[0-9]+'); // Editar
+            Route::put('recorrido/{id}', [RecorridoController::class, 'update']); // Editar
 
             Route::get('recorridos', [RecorridoController::class, 'recorridosUsuario']); // Traer todos los recorridos (por usuario) iOS
             Route::get('recorridos/paginado', [RecorridoController::class, 'recorridosUsuarioPaginado']); // Traer todos los recorridos (por usuario) WEB
