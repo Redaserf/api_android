@@ -62,7 +62,19 @@ class RecorridoController extends Controller
              ]);
      
              $usuario_id = Auth::id();
-     
+            
+            $recorridoActivo = Recorrido::raw(function ($collection) use ($usuario_id) {
+                return $collection->findOne([
+                    'usuario._id' => $usuario_id,
+                    'acabado' => false,
+                ]);
+            });
+
+            if($recorridoActivo) {
+                $recorridoActivo->acabado = true;
+                $recorridoActivo->save();
+            }
+
              $recorrido = Recorrido::create([
                  'usuario' => ['_id' => $usuario_id, 'rol_id' => Auth::user()->rol_id],
                  'bicicleta_id' => $request->bicicleta_id,
