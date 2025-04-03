@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\RecorridoActivo;
 use App\Models\Recorrido;
+use App\Models\Rol;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -83,7 +84,9 @@ class RecorridoController extends Controller
                  'velocidad' => 0,
                  'velocidad_promedio' => 0,
                  'velocidad_maxima' => 0,
-                 'suma_velocidad' => ['suma' => 0, 'cantidad' => 0],
+                //  'suma_velocidad' => ['suma' => 0, 'cantidad' => 0],
+                 'suma' => 0,
+                 'cantidad' => 0,
                  'distancia_recorrida' => rand(1, 100),
                  'temperatura' => 0,
                  'duracion_final' => rand(1, 100),
@@ -149,7 +152,9 @@ class RecorridoController extends Controller
             'velocidad' => 'numeric',
             'velocidad_promedio' => 'numeric',
             'velocidad_maxima' => 'numeric',
-            'suma_velocidad' => 'array',
+            // 'suma_velocidad' => 'array',
+            'suma' => 'numeric',
+            'cantidad' => 'numeric',
             'distancia_recorrida' => 'numeric',
             'duracion_final' => 'numeric',
             'acabado' => 'boolean'
@@ -195,9 +200,9 @@ class RecorridoController extends Controller
                 $recorrido->save();
             }
 
-            if($recorrido->acabado){
-                event(new RecorridoActivo($recorrido));
-            }
+            // if($recorrido->acabado){
+            // }
+            event(new RecorridoActivo($recorrido));
 
             return response()->json([
                 'mensaje' => 'El recorrido se editó correctamente',
@@ -244,9 +249,9 @@ class RecorridoController extends Controller
 
     //=================== [ De aqui para abajo ya todo funciona con mongoDB @hugo]=============================
 
-    public function obtenerDatosWeb()
+    public function obtenerDatosWeb(Request $req)
     {
-        $usuario = Auth::user();
+        $usuario = $req->user();
 
         if (!$usuario) {
             return response()->json(['message' => 'Usuario no autenticado'], 401);
