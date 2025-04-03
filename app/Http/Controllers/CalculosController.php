@@ -59,6 +59,8 @@ class CalculosController extends Controller
         if($recorrido->velocidad_maxima < $velocidad){
             $recorrido->velocidad_maxima = $velocidad;
         }//si la velocidad actual es mayor a la maxima se actualiza la maxima
+
+        $recorrido->temperatura = $request->temperatura;
         $recorrido->suma += $velocidad;
         $recorrido->cantidad += 1;
 
