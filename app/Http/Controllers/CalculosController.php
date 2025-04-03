@@ -51,12 +51,15 @@ class CalculosController extends Controller
 
         $velocidad = $this->calcularVelocidad($x, $y, $z);
 
+
+
+
         $recorrido->velocidad = $velocidad;
         if($recorrido->velocidad_maxima < $velocidad){
             $recorrido->velocidad_maxima = $velocidad;
         }//si la velocidad actual es mayor a la maxima se actualiza la maxima
-        $recorrido->suma_velocidad['suma'] += $velocidad;
-        $recorrido->suma_velocidad['cantidad'] += 1;
+        $recorrido->suma_velocidad->suma += $velocidad;
+        $recorrido->suma_velocidad->cantidad += 1;
 
         $recorrido->velocidad_promedio = $recorrido->suma_velocidad['suma'] / $recorrido->suma_velocidad['cantidad'];//se calcula el promedio de las velocidades
         $recorrido->save();
