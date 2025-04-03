@@ -13,7 +13,7 @@ class CalculosController extends Controller
 
     public function calcularDatosGuardarRecorridoEnMongo(Request $request)
     {
-        
+
         $validaciones = Validator::make($request->all(), [
             'bicicleta_id' => 'required',
             'temperatura' => 'required',
@@ -29,7 +29,7 @@ class CalculosController extends Controller
             'acelerometro.required' => 'El acelerómetro es requerido',
             'giroscopio.required' => 'El giroscopio es requerido',
         ]);
-        
+
         if($validaciones->fails()){
             return response()->json([
                 'message' => 'Datos incorrectos',
@@ -45,12 +45,12 @@ class CalculosController extends Controller
             ], 404);
         }
 
-        $x = $request->acelerometro['x'];
-        $y = $request->acelerometro['y'];
-        $z = $request->acelerometro['z'];
+        $x = $request->acelerometro[0];
+        $y = $request->acelerometro[1];
+        $z = $request->acelerometro[2];
 
         $velocidad = $this->calcularVelocidad($x, $y, $z);
-        
+
         $recorrido->velocidad = $velocidad;
         if($recorrido->velocidad_maxima < $velocidad){
             $recorrido->velocidad_maxima = $velocidad;
@@ -60,7 +60,7 @@ class CalculosController extends Controller
 
         $recorrido->velocidad_promedio = $recorrido->suma_velocidad['suma'] / $recorrido->suma_velocidad['cantidad'];//se calcula el promedio de las velocidades
         $recorrido->save();
-    
+
         return response()->json([
             'message' => 'Datos guardados correctamente'
         ], 200);
@@ -135,11 +135,11 @@ class CalculosController extends Controller
         } else {
             $met = 15.8;
         }
-    
+
         // Fórmula: Calorías = MET × peso (kg) × tiempo (horas)
         return round($met * $pesoUsuario * $tiempoHoras, 2);
     }
-    
+
 
 
     private function calcularDistanciaIncremental($velocidadActual, $tiempoSegundos)
