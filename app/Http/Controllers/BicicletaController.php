@@ -23,16 +23,19 @@ class BicicletaController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     // para iOS
-     public function index(Request $request)
-     {
-         $bicis = Bicicleta::where('usuario_id', $request->user()->id)->select('id', 'nombre')->get();
-     
-         return response()->json([
-             'mensaje' => 'Todo salio bien',
-             'data' => $bicis
-         ]);
-     }
+    // para iOS
+    public function index(Request $request)
+    {
+        $bicis = Bicicleta::where('usuario_id', $request->user()->id)
+                    ->select('id', 'nombre')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+        return response()->json([
+            'mensaje' => 'Todo salio bien',
+            'data' => $bicis
+        ]);
+    }
 
      // para WEB
     public function indexPaginado(Request $request)
