@@ -75,20 +75,14 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
             // ===[ Bicicletas ]===
             Route::post('bicicleta', [BicicletaController::class, 'store']); // Crear
             Route::put('bicicleta/{id}', [BicicletaController::class, 'update'])->where('id', '[0-9]+'); // Editar
-
-            Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis iOS
-            Route::get('bicicleta/paginado', [BicicletaController::class, 'indexPaginado']); // Traer todas las bicis WEB
-
+            Route::get('bicicleta', [BicicletaController::class, 'index']); // Traer todas las bicis
             Route::get('bicicleta/{id}', [BicicletaController::class, 'show'])->where('id', '[0-9]+'); // Traer una bici
             Route::delete('bicicleta/{id}', [BicicletaController::class, 'destroy'])->where('id', '[0-9]+');//eliminar una bici
 
             // ===[ Recorridos ]===
             Route::post('recorrido', [RecorridoController::class, 'store']); // Crear
             Route::put('recorrido/{id}', [RecorridoController::class, 'update'])->where('id', '[0-9]+'); // Editar
-
-            Route::get('recorridos', [RecorridoController::class, 'recorridosUsuario']); // Traer todos los recorridos (por usuario) iOS
-            Route::get('recorridos/paginado', [RecorridoController::class, 'recorridosUsuarioPaginado']); // Traer todos los recorridos (por usuario) WEB
-
+            Route::get('recorridos', [RecorridoController::class, 'recorridosUsuario']); // Traer todos los recorridos (por usuario)
             // Route::get('recorrido', [RecorridoController::class, 'index']); // Traer todos los recorridos, este es el de hugo
             Route::get('recorrido/{id}', [RecorridoController::class, 'show'])->where('id', '[0-9]+'); // Traer un recorrido
             Route::delete('recorrido/{id}', [RecorridoController::class, 'destroy']); // Eliminar un recorrido
@@ -145,7 +139,6 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
     Route::post('v1/prueba/actualizar',[PruebaController::class,'simulacionRecorrido']);
     Route::get('v1/prueba/conexion',[PruebaController::class,'pruebaDeConexion']);
     Route::post("json/raspberry",[PruebaController::class, 'jsonRaspberry']);
-    Route::post("/debug-headers",[PruebaController::class, 'debug']);
     // == [ Re-envio de contra - DLC] ==
 
     Route::post('v1/password/email', [AuthController::class, 'forgotPassword'])->name('password.email');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RecorridoActivo;
 use App\Models\Recorrido;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -76,6 +77,8 @@ class RecorridoController extends Controller
                  'duracion_final' => rand(1, 100),
                  'acabado' => false
              ]);
+
+             event(new RecorridoActivo($recorrido));
      
              return response()->json([
                  'message' => 'Recorrido creado correctamente.',

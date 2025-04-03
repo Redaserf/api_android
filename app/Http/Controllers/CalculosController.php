@@ -119,8 +119,9 @@ class CalculosController extends Controller
     }
 
 
-    private function calcularCalorias($pesoUsuario, $velocidadPromedio, $tiempoHoras)
+    private function calcularCalorias(float $pesoUsuario, float $velocidadPromedio, float $tiempoHoras): float
     {
+        // Determinar el valor MET según la velocidad
         if ($velocidadPromedio <= 8) {
             $met = 4.0;
         } elseif ($velocidadPromedio <= 16) {
@@ -134,9 +135,11 @@ class CalculosController extends Controller
         } else {
             $met = 15.8;
         }
-
-        return $met * $pesoUsuario * $tiempoHoras;
+    
+        // Fórmula: Calorías = MET × peso (kg) × tiempo (horas)
+        return round($met * $pesoUsuario * $tiempoHoras, 2);
     }
+    
 
 
     private function calcularDistanciaIncremental($velocidadActual, $tiempoSegundos)
