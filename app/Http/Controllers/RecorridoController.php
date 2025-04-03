@@ -80,7 +80,7 @@ class RecorridoController extends Controller
                  'usuario' => ['_id' => $usuario_id, 'rol_id' => Auth::user()->rol_id],
                  'bicicleta_id' => $request->bicicleta_id,
                  'calorias' => 0,
-                 'tiempo' => 0,
+                 'tiempo' => time('H:i:s'),
                  'velocidad' => 0,
                  'velocidad_promedio' => 0,
                  'velocidad_maxima' => 0,
