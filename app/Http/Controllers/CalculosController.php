@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RecorridoActivo;
 use App\Models\Recorrido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -108,6 +109,7 @@ class CalculosController extends Controller
 
         $recorrido->save();
 
+        event(new RecorridoActivo($recorrido));
 
         return response()->json([
             'message' => 'Datos obtenidos y procesados correctamente.',

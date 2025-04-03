@@ -23,11 +23,13 @@ class RecorridoActivo implements ShouldBroadcast
      */
     protected $recorridoId;
     protected $usuarioId;
+    protected $acabado;
     public function __construct(Recorrido $recorrido)
     {
         //
         $this->recorridoId = $recorrido['_id'];
         $this->usuarioId = $recorrido->usuario['_id'];
+        $this->acabado = $recorrido['acabado'];
     }
 
     /**
@@ -51,6 +53,7 @@ class RecorridoActivo implements ShouldBroadcast
         return [
             'recorridoId' => $this->recorridoId,
             'usuarioId' => $this->usuarioId,
+            'acabado' => $this->acabado,
         ];
     }
 

@@ -195,6 +195,10 @@ class RecorridoController extends Controller
                 $recorrido->save();
             }
 
+            if($recorrido->acabado){
+                event(new RecorridoActivo($recorrido));
+            }
+
             return response()->json([
                 'mensaje' => 'El recorrido se editó correctamente',
                 'recorrido' => $recorrido
