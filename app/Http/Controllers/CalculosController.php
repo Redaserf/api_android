@@ -23,7 +23,7 @@ class CalculosController extends Controller
             'acelerometro' => 'required',
             'giroscopio' => 'required',
         ], [
-            'bicicleta_id.required' => 'El id del recorrido es requerido',
+            'bicicleta_id.required' => 'El id de la bicicleta es requerido',
             'temperatura.required' => 'La temperatura es requerida',
             'humedad.required' => 'La humedad es requerida',
             'luz_analogica.required' => 'La luz analógica es requerida',
@@ -59,10 +59,10 @@ class CalculosController extends Controller
         if($recorrido->velocidad_maxima < $velocidad){
             $recorrido->velocidad_maxima = $velocidad;
         }//si la velocidad actual es mayor a la maxima se actualiza la maxima
-        $recorrido->suma_velocidad->suma += $velocidad;
-        $recorrido->suma_velocidad->cantidad += 1;
+        $recorrido->suma += $velocidad;
+        $recorrido->cantidad += 1;
 
-        $recorrido->velocidad_promedio = $recorrido->suma_velocidad['suma'] / $recorrido->suma_velocidad['cantidad'];//se calcula el promedio de las velocidades
+        $recorrido->velocidad_promedio = $recorrido->suma / $recorrido->cantidad;//se calcula el promedio de las velocidades
         $recorrido->save();
 
         return response()->json([
