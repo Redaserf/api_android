@@ -61,6 +61,7 @@ class CalculosController extends Controller
         }//si la velocidad actual es mayor a la maxima se actualiza la maxima
         $recorrido->suma_velocidad->suma += $velocidad;
         $recorrido->suma_velocidad->cantidad += 1;
+        $recorrido->temperatura = $request->temperatura;
 
         $recorrido->velocidad_promedio = $recorrido->suma_velocidad['suma'] / $recorrido->suma_velocidad['cantidad'];//se calcula el promedio de las velocidades
         $recorrido->save();
