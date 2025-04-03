@@ -143,10 +143,9 @@ class RecorridoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
         $validaciones = Validator::make($request->all(), [
             'calorias' => 'numeric',
-            'tiempo' => 'date_format:H:i:s',
+            'tiempo' => 'nullable|date_format:H:i:s',
             'velocidad' => 'numeric',
             'velocidad_promedio' => 'numeric',
             'velocidad_maxima' => 'numeric',
@@ -154,63 +153,59 @@ class RecorridoController extends Controller
             'distancia_recorrida' => 'numeric',
             'duracion_final' => 'numeric',
             'acabado' => 'boolean'
-            
         ], [
             'calorias.numeric' => 'El campo calorias debe ser de tipo double',
-
-            'tiempo.date_format' => 'El campo tiempo debe ser con el formato HH::MM::SS',
-
+            'tiempo.date_format' => 'El campo tiempo debe ser con el formato HH:MM:SS',
             'velocidad_promedio.numeric' => 'La velocidad promedio debe ser de tipo double',
-            
-            'velocidad_maxima.numeric' => 'La velocidad maxima debe ser de tipo double',
-
+            'velocidad_maxima.numeric' => 'La velocidad máxima debe ser de tipo double',
             'distancia_recorrida.numeric' => 'La distancia recorrida debe ser de tipo double',
-            
-            'duracion_final.numeric' => 'La duracion final debe ser de tipo double',
-
+            'duracion_final.numeric' => 'La duración final debe ser de tipo double',
             'acabado.boolean' => 'El campo acabado debe ser de tipo boolean'
         ]);
 
-        if($validaciones->fails()){
+        if ($validaciones->fails()) {
             return response()->json([
-                'mensaje' => 'Error en la validacion de los datos',
+                'mensaje' => 'Error en la validación de los datos',
                 'errores' => $validaciones->errors()
             ], 422);
         }
 
         $recorrido = Recorrido::findOrFail($id);
 
-        if($recorrido){
+        if ($recorrido) {
             $recorrido->calorias = $request->calorias ?? $recorrido->calorias;
             $recorrido->tiempo = $request->tiempo ?? $recorrido->tiempo;
+            $recorrido->velocidad = $request->velocidad ?? $recorrido->velocidad;
             $recorrido->velocidad_promedio = $request->velocidad_promedio ?? $recorrido->velocidad_promedio;
             $recorrido->velocidad_maxima = $request->velocidad_maxima ?? $recorrido->velocidad_maxima;
             $recorrido->distancia_recorrida = $request->distancia_recorrida ?? $recorrido->distancia_recorrida;
             $recorrido->duracion_final = $request->duracion_final ?? $recorrido->duracion_final;
             $recorrido->acabado = $request->acabado ?? $recorrido->acabado;
-    
+
             $recorrido->save();
 
-            if($recorrido->acabado){
+            if (
+                $recorrido->acabado &&
+                $recorrido->tiempo &&
+                preg_match('/^\d{2}:\d{2}:\d{2}$/', $recorrido->tiempo)
+            ) {
                 [$horas, $minutos, $segundos] = explode(':', $recorrido->tiempo);
                 $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
                 $recorrido->duracion_final = $tiempoSegundos;
                 $recorrido->save();
             }
 
-
             return response()->json([
-                'mensaje' => 'El recorrido se edito correctamente',
+                'mensaje' => 'El recorrido se editó correctamente',
                 'recorrido' => $recorrido
             ], 200);
-
-        }else{
-            return response()->json([
-                'mensaje' => 'No se encontro el recorrido'
-            ], 404);
         }
 
-    }//no he probado si  funciona con mongoDB
+        return response()->json([
+            'mensaje' => 'No se encontró el recorrido'
+        ], 404);
+    }
+    //no he probado si  funciona con mongoDB
 
     /**
      * Remove the specified resource from storage.
@@ -245,6 +240,28 @@ class RecorridoController extends Controller
 
     //=================== [ De aqui para abajo ya todo funciona con mongoDB @hugo]=============================
 
+    public function obtenerDatosWeb()
+    {
+        $usuario = Auth::user();
+
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+
+        $recorrido = Recorrido::where('usuario._id', $usuario->id)
+            ->where('acabado', false)
+            ->first();
+
+        if (!$recorrido) {
+            return response()->json(['message' => 'No hay recorrido activo'], 404);
+        }
+
+        return response()->json([
+            'mensaje' => 'Recorrido activo encontrado',
+            'recorrido' => $recorrido
+        ], 200);
+    }
+
     // para iOS
     public function recorridosUsuario()
     {
@@ -255,21 +272,21 @@ class RecorridoController extends Controller
         }
     
         $recorridos = $usuario->recorridos(function ($query) {
-            $query->with('bicicleta');
-            })
-            ->map(function ($recorrido) {
-                return [
-                    'id' => $recorrido->id,
-                    'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
-                    'calorias' => $recorrido->calorias,
-                    'tiempo' => $recorrido->tiempo,
-                    'velocidad_promedio' => $recorrido->velocidad_promedio,
-                    'velocidad_maxima' => $recorrido->velocidad_maxima,
-                    'distancia_recorrida' => $recorrido->distancia_recorrida,
-                    'temperatura' => $recorrido->temperatura,
-                    'created_at' => $recorrido->created_at->toDateTimeString(),
-                ];
-            });
+            $query->with('bicicleta')->orderBy('created_at', 'desc');
+        })
+        ->map(function ($recorrido) {
+            return [
+                'id' => $recorrido->id,
+                'bicicleta_nombre' => $recorrido->bicicleta()->nombre ?? 'Sin nombre',
+                'calorias' => $recorrido->calorias,
+                'tiempo' => $recorrido->tiempo,
+                'velocidad_promedio' => $recorrido->velocidad_promedio,
+                'velocidad_maxima' => $recorrido->velocidad_maxima,
+                'distancia_recorrida' => $recorrido->distancia_recorrida,
+                'temperatura' => $recorrido->temperatura,
+                'created_at' => $recorrido->created_at->toDateTimeString(),
+            ];
+        });        
     
         return response()->json([
             'message' => 'Recorridos obtenidos con éxito',
