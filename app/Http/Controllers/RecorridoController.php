@@ -79,17 +79,17 @@ class RecorridoController extends Controller
              $recorrido = Recorrido::create([
                  'usuario' => ['_id' => $usuario_id, 'rol_id' => Auth::user()->rol_id],
                  'bicicleta_id' => $request->bicicleta_id,
-                 'calorias' => rand(1, 100),
-                 'tiempo' => 0,
+                 'calorias' => 0,
+                 'tiempo' => '00:00:00',
                  'velocidad' => 0,
                  'velocidad_promedio' => 0,
                  'velocidad_maxima' => 0,
                 //  'suma_velocidad' => ['suma' => 0, 'cantidad' => 0],
                  'suma' => 0,
                  'cantidad' => 0,
-                 'distancia_recorrida' => rand(1, 100),
+                 'distancia_recorrida' => 0,
                  'temperatura' => 0,
-                 'duracion_final' => rand(1, 100),
+                 'duracion_final' => 0,
                  'acabado' => false
              ]);
 
