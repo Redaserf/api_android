@@ -112,6 +112,7 @@ Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
 
             // =======================[ Obtener datos de recorrido actual ]=============================
             Route::post('datos', [CalculosController::class, 'obtenerDatos']);
+            Route::get('recorrido-activo', [RecorridoController::class, 'obtenerDatosWeb']); // para la web
 
             Route::middleware(['auth.admin'])->group(function () {
 
