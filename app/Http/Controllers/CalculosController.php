@@ -55,6 +55,7 @@ class CalculosController extends Controller
 
 
 
+        $recorrido->acelerometro = $request->acelerometro;
         $recorrido->velocidad = $velocidad;
         if($recorrido->velocidad_maxima < $velocidad){
             $recorrido->velocidad_maxima = $velocidad;
