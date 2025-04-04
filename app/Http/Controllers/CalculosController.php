@@ -44,30 +44,30 @@ class CalculosController extends Controller
             ], 404);
         }
 
-        $x = $request->acelerometro[0];
-        $y = $request->acelerometro[1];
-        $z = $request->acelerometro[2];
+        // $x = $request->acelerometro[0];
+        // $y = $request->acelerometro[1];
+        // $z = $request->acelerometro[2];
 
-        $velocidad = $this->calcularVelocidad($x, $y, $z, $recorrido);//se calcula la velocidad actual con los valores del acelerometro y la velocidad anterior
-
-
+        // $velocidad = $this->calcularVelocidad($x, $y, $z, $recorrido);//se calcula la velocidad actual con los valores del acelerometro y la velocidad anterior
 
 
-        $recorrido->acelerometro = $request->acelerometro;
-        $recorrido->velocidad = $velocidad;
 
-        Log::info("Velocidad calculada: " . $velocidad);
-        Log::info("Valores de acelerómetro: X={$x}, Y={$y}, Z={$z}");
 
-        if($recorrido->velocidad_maxima < $velocidad){
-            $recorrido->velocidad_maxima = $velocidad;
-        }//si la velocidad actual es mayor a la maxima se actualiza la maxima
+        // $recorrido->acelerometro = $request->acelerometro;
+        // $recorrido->velocidad = $velocidad;
+
+        // Log::info("Velocidad calculada: " . $velocidad);
+        // Log::info("Valores de acelerómetro: X={$x}, Y={$y}, Z={$z}");
+
+        // if($recorrido->velocidad_maxima < $velocidad){
+        //     $recorrido->velocidad_maxima = $velocidad;
+        // }//si la velocidad actual es mayor a la maxima se actualiza la maxima
 
         $recorrido->temperatura = $request->temperatura;
-        $recorrido->suma += $velocidad;
-        $recorrido->cantidad += 1;
+        // $recorrido->suma += $velocidad;
+        // $recorrido->cantidad += 1;
 
-        $recorrido->velocidad_promedio = $recorrido->suma / $recorrido->cantidad;//se calcula el promedio de las velocidades
+        // $recorrido->velocidad_promedio = $recorrido->suma / $recorrido->cantidad;//se calcula el promedio de las velocidades
         $recorrido->save();
 
         return response()->json([
@@ -81,8 +81,11 @@ class CalculosController extends Controller
         $validaciones = Validator::make($request->all(), [
             'recorrido_id' => 'required',
             'tiempo' => 'required',
+            'velocidad' => 'required',
         ], [
             'recorrido_id.required' => 'El id del recorrido es requerido',
+            'tiempo.required' => 'El tiempo es requerido',
+            'velocidad.required' => 'La velocidad es requerida',
         ]);
 
 
@@ -100,6 +103,14 @@ class CalculosController extends Controller
                 'message' => 'Recorrido no encontrado'
             ], 404);
         }
+
+        $recorrido->velocidad = $request->velocidad;
+        $recorrido->suma += $request->velocidad;
+        $recorrido->cantidad += 1;
+        $recorrido->velocidad_promedio = $recorrido->suma / $recorrido->cantidad;//se calcula el promedio de las velocidades
+        $recorrido->velocidad_maxima = max($recorrido->velocidad_maxima, $request->velocidad);//si la velocidad actual es mayor a la maxima se actualiza la maxima
+
+        $recorrido->save();
 
         $tiempo = $request->tiempo;
         $pesoUsuario = $request->user()->peso;
@@ -124,8 +135,6 @@ class CalculosController extends Controller
             'recorrido' => $recorrido,
             'peso_perdido' => $pesoPerdidoKilogramos,
         ]);
-
-
     }
 
 
@@ -146,7 +155,6 @@ class CalculosController extends Controller
             $met = 15.8;
         }
 
-        // Fórmula: Calorías = MET × peso (kg) × tiempo (horas)
         return round($met * $pesoUsuario * $tiempoHoras, 2);
     }
 
