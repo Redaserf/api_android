@@ -48,7 +48,7 @@ class CalculosController extends Controller
         $y = $request->acelerometro[1];
         $z = $request->acelerometro[2];
 
-        $velocidad = $this->calcularVelocidad($x, $y, $z, $recorrido->velocidad);//se calcula la velocidad actual con los valores del acelerometro y la velocidad anterior
+        $velocidad = $this->calcularVelocidad($x, $y, $z, $recorrido);//se calcula la velocidad actual con los valores del acelerometro y la velocidad anterior
 
 
 
@@ -160,16 +160,15 @@ class CalculosController extends Controller
     }
 
 
-
-    public function calcularVelocidad($ax, $ay, $az, $ultimaVelocidad)
+    public function calcularVelocidad($ax, $ay, $az, Recorrido $recorrido)
     {
         $ax = floatval($ax);
         $ay = floatval($ay);
         $az = floatval($az);
     
         $GRAVEDAD = 9.81;
-    
         $az -= $GRAVEDAD;
+    
         $deltaT = 2;
     
         $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2) + pow($az, 2));
@@ -177,14 +176,19 @@ class CalculosController extends Controller
         if ($aceleracion < 0.1) {
             $aceleracion = 0;
         }
-
+    
+        $ultimaVelocidad = $recorrido->velocidad ?? 0;
+    
         $nuevaVelocidad = $ultimaVelocidad + ($aceleracion * $deltaT);
+        $nuevaVelocidad = max(0, $nuevaVelocidad); // evitar negativos
     
-        $nuevaVelocidad = max(0, $nuevaVelocidad);
+        $recorrido->velocidad = $nuevaVelocidad * 3.6;
     
-        $ultimaVelocidad = $nuevaVelocidad;
+        if ($recorrido->velocidad_maxima < $recorrido->velocidad) {
+            $recorrido->velocidad_maxima = $recorrido->velocidad;
+        }
     
-        return $nuevaVelocidad * 3.6;
+        $recorrido->save();
     }
     
 
