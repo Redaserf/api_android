@@ -19,14 +19,12 @@ class CalculosController extends Controller
             'bicicleta_id' => 'required',
             'temperatura' => 'required',
             'humedad' => 'required',
-            'luz_analogica' => 'required',
             'acelerometro' => 'required',
             'giroscopio' => 'required',
         ], [
             'bicicleta_id.required' => 'El id de la bicicleta es requerido',
             'temperatura.required' => 'La temperatura es requerida',
             'humedad.required' => 'La humedad es requerida',
-            'luz_analogica.required' => 'La luz analógica es requerida',
             'acelerometro.required' => 'El acelerómetro es requerido',
             'giroscopio.required' => 'El giroscopio es requerido',
         ]);
@@ -57,6 +55,10 @@ class CalculosController extends Controller
 
         $recorrido->acelerometro = $request->acelerometro;
         $recorrido->velocidad = $velocidad;
+
+        Log::info("Velocidad calculada: " . $velocidad);
+        Log::info("Valores de acelerómetro: X={$x}, Y={$y}, Z={$z}");
+
         if($recorrido->velocidad_maxima < $velocidad){
             $recorrido->velocidad_maxima = $velocidad;
         }//si la velocidad actual es mayor a la maxima se actualiza la maxima
