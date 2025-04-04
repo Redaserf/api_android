@@ -167,11 +167,20 @@ class CalculosController extends Controller
         $ay = floatval($ay);
         $az = floatval($az);
     
-        $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2) + pow($az, 2));
+        $GRAVEDAD = 9.81;
     
+        $az -= $GRAVEDAD;
         $deltaT = 2;
     
+        $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2) + pow($az, 2));
+    
+        if ($aceleracion < 0.1) {
+            $aceleracion = 0;
+        }
+
         $nuevaVelocidad = $ultimaVelocidad + ($aceleracion * $deltaT);
+    
+        $nuevaVelocidad = max(0, $nuevaVelocidad);
     
         $ultimaVelocidad = $nuevaVelocidad;
     
