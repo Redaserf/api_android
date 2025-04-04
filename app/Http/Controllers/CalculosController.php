@@ -56,6 +56,10 @@ class CalculosController extends Controller
 
 
         $recorrido->velocidad = $velocidad;
+
+        Log::info("Velocidad calculada: " . $velocidad);
+        Log::info("Valores de acelerómetro: X={$x}, Y={$y}, Z={$z}");
+
         if($recorrido->velocidad_maxima < $velocidad){
             $recorrido->velocidad_maxima = $velocidad;
         }//si la velocidad actual es mayor a la maxima se actualiza la maxima
