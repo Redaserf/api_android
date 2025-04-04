@@ -90,7 +90,7 @@ class RecorridoController extends Controller
                  'distancia_recorrida' => 0,
                  'temperatura' => 0,
                  'duracion_final' => 0,
-                 'acabado' => false
+                 'acabado' => false,
              ]);
 
              event(new RecorridoActivo($recorrido));

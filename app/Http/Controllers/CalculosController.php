@@ -48,7 +48,7 @@ class CalculosController extends Controller
         $y = $request->acelerometro[1];
         $z = $request->acelerometro[2];
 
-        $velocidad = $this->calcularVelocidad($x, $y, $z);
+        $velocidad = $this->calcularVelocidad($x, $y, $z, $recorrido->velocidad);//se calcula la velocidad actual con los valores del acelerometro y la velocidad anterior
 
 
 
@@ -160,17 +160,23 @@ class CalculosController extends Controller
     }
 
 
-    private function calcularVelocidad($ax, $ay, $az)
-    {
-        Log::info("Valores de acelerómetro: X={$ax}, Y={$ay}, Z={$az}");
 
+    public function calcularVelocidad($ax, $ay, $az, $ultimaVelocidad)
+    {
         $ax = floatval($ax);
         $ay = floatval($ay);
         $az = floatval($az);
-
+    
         $aceleracion = sqrt(pow($ax, 2) + pow($ay, 2) + pow($az, 2));
-
-        return $aceleracion * 3.6;
+    
+        $deltaT = 2;
+    
+        $nuevaVelocidad = $ultimaVelocidad + ($aceleracion * $deltaT);
+    
+        $ultimaVelocidad = $nuevaVelocidad;
+    
+        return $nuevaVelocidad * 3.6;
     }
+    
 
 }
