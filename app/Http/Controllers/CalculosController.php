@@ -19,14 +19,15 @@ class CalculosController extends Controller
             'bicicleta_id' => 'required',
             'temperatura' => 'required',
             'humedad' => 'required',
-            'acelerometro' => 'required',
-            'giroscopio' => 'required',
+            // 'acelerometro' => 'required',
+            // 'giroscopio' => 'required',
+            'velocidad' => 'required',
         ], [
             'bicicleta_id.required' => 'El id de la bicicleta es requerido',
             'temperatura.required' => 'La temperatura es requerida',
             'humedad.required' => 'La humedad es requerida',
-            'acelerometro.required' => 'El acelerómetro es requerido',
-            'giroscopio.required' => 'El giroscopio es requerido',
+            // 'acelerometro.required' => 'El acelerómetro es requerido',
+            // 'giroscopio.required' => 'El giroscopio es requerido',
         ]);
 
         if($validaciones->fails()){
@@ -63,6 +64,7 @@ class CalculosController extends Controller
         //     $recorrido->velocidad_maxima = $velocidad;
         // }//si la velocidad actual es mayor a la maxima se actualiza la maxima
 
+        $recorrido->velocidad = $request->velocidad;
         $recorrido->temperatura = $request->temperatura;
         // $recorrido->suma += $velocidad;
         // $recorrido->cantidad += 1;
