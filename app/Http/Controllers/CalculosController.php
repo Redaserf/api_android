@@ -75,9 +75,8 @@ class CalculosController extends Controller
         ], 200);
     }
 
-    public function obtenerDatos(Request $request){
-
-
+    public function obtenerDatos(Request $request)
+    {
         $validaciones = Validator::make($request->all(), [
             'recorrido_id' => 'required',
             'tiempo' => 'required',
@@ -88,57 +87,56 @@ class CalculosController extends Controller
             'tiempo.required' => 'El tiempo es requerido',
             'velocidad.required' => 'La velocidad es requerida',
         ]);
-
-
-        if($validaciones->fails()){
+    
+        if ($validaciones->fails()) {
             return response()->json([
                 'message' => 'Datos incorrectos',
                 'errors' => $validaciones->errors()
             ], 422);
         }
-
+    
         $recorrido = Recorrido::find($request->recorrido_id);
-
-        if(!$recorrido){
+    
+        if (!$recorrido) {
             return response()->json([
                 'message' => 'Recorrido no encontrado'
             ], 404);
         }
-
-        $recorrido->velocidad = $request->velocidad;
-        $recorrido->suma += $request->velocidad;
+    
+        $velocidad = round($request->velocidad, 2);
+        $recorrido->velocidad = $velocidad;
+        $recorrido->suma = round($recorrido->suma + $velocidad, 2);
         $recorrido->cantidad += 1;
-        $recorrido->velocidad_promedio = $recorrido->suma / $recorrido->cantidad;//se calcula el promedio de las velocidades
-        $recorrido->velocidad_maxima = max($recorrido->velocidad_maxima, $request->velocidad);//si la velocidad actual es mayor a la maxima se actualiza la maxima
-
-        $recorrido->save();
-
+        $recorrido->velocidad_promedio = round($recorrido->suma / $recorrido->cantidad, 2);
+        $recorrido->velocidad_maxima = round(max($recorrido->velocidad_maxima, $velocidad), 2);
+    
         $tiempo = $request->tiempo;
-        $pesoUsuario = $request->user()->peso;  
-
+        $pesoUsuario = $request->user()->peso;
+    
         [$horas, $minutos, $segundos] = explode(':', $tiempo);
         $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
         $tiempoHoras = $tiempoSegundos / 3600;
-
-        if($request->velocidad > 0.3){
-            $caloriasQuemadas = $this->calcularCalorias($pesoUsuario, $recorrido->velocidad_promedio, $tiempoHoras);
-            $recorrido->calorias += $caloriasQuemadas;
+    
+        if ($velocidad > 0.3) {
+            $caloriasQuemadas = round($this->calcularCalorias($pesoUsuario, $recorrido->velocidad_promedio, $tiempoHoras), 2);
+            $recorrido->calorias = round($recorrido->calorias + $caloriasQuemadas, 2);
         }
-
+    
         $recorrido->tiempo = $tiempo;
-        $recorrido->distancia_recorrida += $request->distancia;
-        $pesoPerdidoKilogramos = $recorrido->calorias / 7700; //7000 calorias son 1 kilogramo perdido
-
+        $recorrido->distancia_recorrida = round($recorrido->distancia_recorrida + $request->distancia, 2);
+        $pesoPerdidoKilogramos = round($recorrido->calorias / 7700, 2);
+    
         $recorrido->save();
-
+    
         event(new RecorridoActivo($recorrido));
-
+    
         return response()->json([
             'message' => 'Datos obtenidos y procesados correctamente.',
             'recorrido' => $recorrido,
             'peso_perdido' => $pesoPerdidoKilogramos,
         ]);
     }
+    
 
 
     private function calcularCalorias(float $pesoUsuario, float $velocidadPromedio, float $tiempoHoras): float
