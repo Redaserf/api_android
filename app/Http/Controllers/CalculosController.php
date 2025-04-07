@@ -123,7 +123,7 @@ class CalculosController extends Controller
         }
     
         $recorrido->tiempo = $tiempo;
-        $recorrido->distancia_recorrida = round($recorrido->distancia_recorrida + $request->distancia, 2);
+        $recorrido->distancia_recorrida = round($request->distancia, 2);
         $pesoPerdidoKilogramos = round($recorrido->calorias / 7700, 2);
     
         $recorrido->save();
