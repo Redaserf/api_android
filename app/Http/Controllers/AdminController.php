@@ -214,6 +214,7 @@ class AdminController extends Controller
 
         $isoAnio = Carbon::now()->isoWeekYear;//el año en formato iso(2025)
         $data = [];
+        $labels = [];
         foreach($recorridos as $recorrido){
         //de cada semana ocupo sacar el mes y el dia en el q se hizo
             
