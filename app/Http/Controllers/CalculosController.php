@@ -114,7 +114,7 @@ class CalculosController extends Controller
         $recorrido->save();
 
         $tiempo = $request->tiempo;
-        $pesoUsuario = $request->user()->peso;
+        $pesoUsuario = $request->user()->peso;  
 
         [$horas, $minutos, $segundos] = explode(':', $tiempo);
         $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
