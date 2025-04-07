@@ -82,6 +82,7 @@ class CalculosController extends Controller
             'recorrido_id' => 'required',
             'tiempo' => 'required',
             'velocidad' => 'required',
+            'distancia' => 'required',
         ], [
             'recorrido_id.required' => 'El id del recorrido es requerido',
             'tiempo.required' => 'El tiempo es requerido',
@@ -117,13 +118,15 @@ class CalculosController extends Controller
 
         [$horas, $minutos, $segundos] = explode(':', $tiempo);
         $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
-        $distanciaIncremental = $this->calcularDistanciaIncremental($recorrido->velocidad, 5); // Intervalo de 5 segundos
         $tiempoHoras = $tiempoSegundos / 3600;
-        $caloriasQuemadas = $this->calcularCalorias($pesoUsuario, $recorrido->velocidad_promedio, $tiempoHoras);
+
+        if($request->velocidad > 0.3){
+            $caloriasQuemadas = $this->calcularCalorias($pesoUsuario, $recorrido->velocidad_promedio, $tiempoHoras);
+            $recorrido->calorias += $caloriasQuemadas;
+        }
 
         $recorrido->tiempo = $tiempo;
-        $recorrido->calorias += $caloriasQuemadas;
-        $recorrido->distancia_recorrida += $distanciaIncremental;
+        $recorrido->distancia_recorrida += $request->distancia;
         $pesoPerdidoKilogramos = $recorrido->calorias / 7700; //7000 calorias son 1 kilogramo perdido
 
         $recorrido->save();
